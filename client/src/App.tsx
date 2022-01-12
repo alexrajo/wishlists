@@ -2,6 +2,7 @@ import React from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
+import ProfileDisplay from "./pages/ProfileDisplay";
 import Users from "./pages/Users";
 import WishlistsContainer from "./pages/WishlistsContainer";
 
@@ -19,6 +20,7 @@ function App() {
             <Routes>
               <Route path="/" element={<Home/>}/>
               <Route path="/lists" element={<WishlistsContainer/>}/>
+              <Route path="/profile/:id" element={<ProfileDisplay/>}/>
               <Route path="/users" element={<Users/>}/>
             </Routes>
           </div>

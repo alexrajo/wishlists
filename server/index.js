@@ -13,15 +13,33 @@ const credentials = {
     dialect: "postgres"
 };
 
+const pool = new Pool(credentials);
+
 const getAllUsers = async () =>  {
-    const pool = new Pool(credentials);
     const result = await pool.query("SELECT * FROM users");
     return result;
 }
 
+const getUser = async (id) => {
+    const result = await pool.query("SELECT * FROM users WHERE id=" + id);
+    return result.rows[0];
+}
+
 app.get("/users", (req, res) => {
-    const users = getAllUsers().then(users => {
+    getAllUsers().then(users => {
         res.json(users);
+    }).catch(err => {
+        res.statusMessage = err;
+        res.status(500).end();
+    });
+});
+
+app.get("/profile/:id", (req, res) => {
+    getUser(req.params.id).then(user => {
+        if (user == null) {
+            throw Error("User data not found.");
+        }
+        res.send(user);
     }).catch(err => {
         res.statusMessage = err;
         res.status(500).end();
