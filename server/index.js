@@ -5,32 +5,41 @@ const { Pool, Client } = require("pg");
 
 
 const credentials = {
-    user: "postgres",
-    password: "postgres",
-    host: "localhost",
+    user: process.env.DB_USER || "postgres",
+    password: process.env.DB_PASSWORD || "postgres",
+    host: process.env.DB_HOST || "localhost",
     port: process.env.DB_PORT || 5432,
-    database: "wishlist-db",
+    database: process.env.DB_NAME || "wishlist-db",
     dialect: "postgres"
 };
 
 const pool = new Pool(credentials);
 
 const getAllUsers = async () =>  {
-    const result = await pool.query("SELECT * FROM users");
+    const result = await pool.query("SELECT * FROM users LIMIT 50");
     return result;
 }
 
 const getUser = async (id) => {
-    const result = await pool.query("SELECT * FROM users WHERE id=" + id);
+    const result = await pool.query("SELECT username, first_name, last_name, date_of_birth FROM users WHERE id=" + id);
     return result.rows[0];
+}
+
+const getUserWishlists = async(userId) => {
+    const result = await pool.query("SELECT * FROM wishlists WHERE owner_id=" + userId);
+    return result.rows;
+}
+
+const handleCatch = (err, res) => {
+    res.statusMessage = err;
+    res.status(500).end();
 }
 
 app.get("/users", (req, res) => {
     getAllUsers().then(users => {
         res.json(users);
     }).catch(err => {
-        res.statusMessage = err;
-        res.status(500).end();
+        handleCatch(err, res);
     });
 });
 
@@ -41,8 +50,15 @@ app.get("/profile/:id", (req, res) => {
         }
         res.send(user);
     }).catch(err => {
-        res.statusMessage = err;
-        res.status(500).end();
+        handleCatch(err, res);
+    });
+});
+
+app.get("/user_wishlists/:id", (req, res) => {
+    getUserWishlists(req.params.id).then(lists => {
+        res.json(lists);
+    }).catch(err => {
+        handleCatch(err, res);
     });
 });
 

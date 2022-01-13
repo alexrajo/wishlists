@@ -11,17 +11,17 @@ function App() {
     <Router>
       <div className="App">
         <div className="topbar"></div>
-        <Navbar/>
+        <Navbar />
         <button onClick={console.log} className="show-navbar-button">
           Show navbar
         </button>
         <main>
           <div className="content">
             <Routes>
-              <Route path="/" element={<Home/>}/>
-              <Route path="/lists" element={<WishlistsContainer/>}/>
-              <Route path="/profile/:id" element={<ProfileDisplay/>}/>
-              <Route path="/users" element={<Users/>}/>
+              <Route path="/" element={<Home />} />
+              <Route path="/lists" element={<WishlistsContainer wishlists={[]} />} />
+              <Route path="/profile/:id" element={<ProfileDisplay />} />
+              <Route path="/users" element={<Users />} />
             </Routes>
           </div>
         </main>

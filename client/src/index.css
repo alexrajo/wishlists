@@ -88,6 +88,10 @@ main {
   width: 15vw;
 }
 
+.link {
+  width: fit-content;
+}
+
 @media only screen and (max-width: 1700px) {
   .wishlist-list-container {
     grid-template-columns: repeat(4, 1fr);
