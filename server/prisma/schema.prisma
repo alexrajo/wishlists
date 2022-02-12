@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model auth_tokens {
+  id        Int      @id @default(autoincrement())
+  user_id   Int
+  value     String   @db.VarChar(20)
+  last_used DateTime @db.Timestamp(6)
+  users     users    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model friendships {
+  user1_id                          Int
+  user2_id                          Int
+  confirmed                         Boolean
+  users_friendships_user1_idTousers users   @relation("friendships_user1_idTousers", fields: [user1_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user1")
+  users_friendships_user2_idTousers users   @relation("friendships_user2_idTousers", fields: [user2_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user2")
+
+  @@ignore
+}
+
+model users {
+  id                                      Int           @id @default(autoincrement())
+  username                                String        @db.VarChar(20)
+  password                                String        @db.VarChar(30)
+  first_name                              String        @db.VarChar(25)
+  last_name                               String        @db.VarChar(25)
+  date_of_birth                           DateTime      @db.Date
+  email                                   String?       @db.VarChar(254)
+  auth_tokens                             auth_tokens[]
+  friendships_friendships_user1_idTousers friendships[] @relation("friendships_user1_idTousers") @ignore
+  friendships_friendships_user2_idTousers friendships[] @relation("friendships_user2_idTousers") @ignore
+  wishlists                               wishlists[]
+}
+
+model wishlists {
+  id          BigInt  @id @default(autoincrement())
+  owner_id    Int
+  title       String  @db.VarChar(25)
+  description String? @db.VarChar(128)
+  list        Json
+  users       users   @relation(fields: [owner_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_owner")
+}
