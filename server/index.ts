@@ -15,6 +15,7 @@ const addUser = async (user: Prisma.usersCreateInput) => {
 };
 
 app.get("/", (req, res) => {
+  console.log("Request received!");
   res.send("Hello!");
 });
 
@@ -27,7 +28,7 @@ app.post("/add_user", (req, res) => {
     date_of_birth: "1994-08-04",
     email: "bobbyman123@gmail.com",
   };
-  addUser(newUser);
+  res.json(addUser(newUser));
 });
 
 app.listen(PORT, () => {
