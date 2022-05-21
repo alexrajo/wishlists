@@ -41,9 +41,19 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
 exports.__esModule = true;
 var express_1 = __importDefault(require("express"));
 var PrismaClient = require("@prisma/client").PrismaClient;
+var bcrypt = require("bcrypt");
+var saltRounds = 10;
 var PORT = process.env.PORT || 3001;
 var prisma = new PrismaClient();
 var app = (0, express_1["default"])();
+var testUser = {
+    username: "bobbysox",
+    password: "abc123",
+    firstName: "Bobby",
+    lastName: "Shmurda",
+    dateOfBirth: "1994-08-04",
+    email: "bobbyman123@gmail.com"
+};
 var addWishlist = function () { return __awaiter(void 0, void 0, void 0, function () { return __generator(this, function (_a) {
     return [2 /*return*/];
 }); }); };
@@ -51,12 +61,23 @@ var addUser = function (user) { return __awaiter(void 0, void 0, void 0, functio
     var newUser;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, prisma.users.create({
+            case 0: return [4 /*yield*/, prisma.user.create({
                     data: user
                 })];
             case 1:
                 newUser = _a.sent();
-                return [2 /*return*/];
+                return [2 /*return*/, newUser];
+        }
+    });
+}); };
+var getUsers = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var users;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0: return [4 /*yield*/, prisma.user.findMany()];
+            case 1:
+                users = _a.sent();
+                return [2 /*return*/, users];
         }
     });
 }); };
@@ -64,16 +85,51 @@ app.get("/", function (req, res) {
     console.log("Request received!");
     res.send("Hello!");
 });
-app.post("/add_user", function (req, res) {
-    var newUser = {
-        username: "bobbysox",
-        password: "abc123",
-        first_name: "Bobby",
-        last_name: "Shmurda",
-        date_of_birth: "1994-08-04",
-        email: "bobbyman123@gmail.com"
-    };
-    res.json(addUser(newUser));
+app.get("/get_users", function (req, res) {
+    getUsers().then(function (users) {
+        res.json(users);
+    })["catch"](function (e) {
+        console.error(e.message);
+        res.status(500).send("An error occurred while getting users from database!");
+    });
+});
+app.post("/register", function (req, res) { return __awaiter(void 0, void 0, void 0, function () {
+    var _a, username, password, firstName, lastName, dateOfBirth, email, encrytpedPassword, newUser, _b;
+    return __generator(this, function (_c) {
+        switch (_c.label) {
+            case 0:
+                _c.trys.push([0, 2, , 3]);
+                _a = req.body, username = _a.username, password = _a.password, firstName = _a.firstName, lastName = _a.lastName, dateOfBirth = _a.dateOfBirth, email = _a.email;
+                return [4 /*yield*/, bcrypt.hash(password, saltRounds)];
+            case 1:
+                encrytpedPassword = _c.sent();
+                if (!(username && password && firstName && lastName && dateOfBirth)) {
+                    res.status(400).send("Missing input!");
+                }
+                newUser = {
+                    username: username,
+                    password: password,
+                    firstName: firstName,
+                    lastName: lastName,
+                    dateOfBirth: dateOfBirth,
+                    email: email
+                };
+                if (!addUser(newUser)) {
+                    throw new Error();
+                }
+                ;
+                return [3 /*break*/, 3];
+            case 2:
+                _b = _c.sent();
+                res.status(500).send("Could not register due to an internal server error. Please try again later.");
+                return [3 /*break*/, 3];
+            case 3:
+                ;
+                return [2 /*return*/];
+        }
+    });
+}); });
+app.post("/login", function (req, res) {
 });
 app.listen(PORT, function () {
     console.log("Server listening on port ".concat(PORT));

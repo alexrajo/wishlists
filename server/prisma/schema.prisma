@@ -7,44 +7,50 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model auth_tokens {
-  id        Int      @id @default(autoincrement())
-  user_id   Int
-  value     String   @db.VarChar(20)
-  last_used DateTime @db.Timestamp(6)
-  users     users    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user")
+model AuthToken {
+  id                    Int      @id @default(autoincrement())
+  user_id               Int
+  value                 String   @db.VarChar(20)
+  last_used             DateTime @db.Timestamp(6)
+  users                 User    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user")
+  @@map("auth_tokens")
 }
 
 /// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
-model friendships {
-  user1_id                          Int
-  user2_id                          Int
-  confirmed                         Boolean
-  users_friendships_user1_idTousers users   @relation("friendships_user1_idTousers", fields: [user1_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user1")
-  users_friendships_user2_idTousers users   @relation("friendships_user2_idTousers", fields: [user2_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user2")
+model Friendship {
+  user2Id               Int @map("user2_id")
+  user1Id               Int @map("user1_id")
+  confirmed             Boolean
+  user1                 User   @relation("friendships_user1_idTousers", fields: [user1Id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user1") //initiating user
+  user2                 User   @relation("friendships_user2_idTousers", fields: [user2Id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user2") //request-receiving user
 
   @@ignore
+  @@map("friendships")
 }
 
-model users {
-  id                                      Int           @id @default(autoincrement())
-  username                                String        @db.VarChar(20)
-  password                                String        @db.VarChar(30)
-  first_name                              String        @db.VarChar(25)
-  last_name                               String        @db.VarChar(25)
-  date_of_birth                           DateTime      @db.Date
-  email                                   String?       @db.VarChar(254)
-  auth_tokens                             auth_tokens[]
-  friendships_friendships_user1_idTousers friendships[] @relation("friendships_user1_idTousers") @ignore
-  friendships_friendships_user2_idTousers friendships[] @relation("friendships_user2_idTousers") @ignore
-  wishlists                               wishlists[]
+model User {
+  id                         Int           @id @default(autoincrement())
+  username                   String        @db.VarChar(20) @unique
+  password                   String        @db.Char(60)
+  firstName                  String        @db.VarChar(25)    @map("first_name")
+  lastName                   String        @db.VarChar(25)    @map("last_name")
+  dateOfBirth                DateTime      @db.Date           @map("date_of_birth")
+  email                      String?       @db.VarChar(254) @unique
+  auth_tokens                AuthToken[]
+  friendships_as_user1       Friendship[] @relation("friendships_user1_idTousers") @ignore
+  friendships_as_user2       Friendship[] @relation("friendships_user2_idTousers") @ignore
+  wishlists                  Wishlist[]
+
+  @@map("users")
 }
 
-model wishlists {
-  id          BigInt  @id @default(autoincrement())
-  owner_id    Int
-  title       String  @db.VarChar(25)
-  description String? @db.VarChar(128)
-  list        Json
-  users       users   @relation(fields: [owner_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_owner")
+model Wishlist {
+  id                    BigInt  @id @default(autoincrement())
+  ownerId               Int @map("owner_id")
+  title                 String  @db.VarChar(25)
+  description           String? @db.VarChar(128)
+  list                  Json
+  users                 User   @relation(fields: [ownerId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_owner")
+
+  @@map("wishlists")
 }
