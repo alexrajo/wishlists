@@ -1,9 +1,10 @@
 import express from "express";
-import { Prisma } from "@prisma/client";
+import { Prisma, User } from "@prisma/client";
 import e from "express";
 
 const { PrismaClient } = require("@prisma/client");
 const bcrypt = require("bcrypt");
+const session = require("express-session");
 const saltRounds = 10;
 
 const PORT = process.env.PORT || 3001;
@@ -12,15 +13,13 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
-
-const testUser = {
-  username: "bobbysox",
-  password: "abc123",
-  firstName: "Bobby",
-  lastName: "Shmurda",
-  dateOfBirth: "1994-08-04",
-  email: "bobbyman123@gmail.com",
-};
+app.use(session({
+  secret: process.env.SESSION_SECRET || "TestSecret",
+  resave: false,
+  cookie: {
+    secure: false //Needs to be changed once https has been put in place
+  }
+}));
 
 const addWishlist = async () => {};
 
@@ -38,7 +37,13 @@ const getUsers = async () => {
 
 app.get("/", (req, res) => {
   console.log("Request received!");
-  res.send("Hello!");
+
+  const session = req.session;
+  if (session) {
+    res.send(session.loggedin ? "Hello, " + session.username + "!" : "Hello!");
+  } else {
+    res.status(500).send("An error occurred: Could not load session data.");
+  }
 });
 
 app.get("/get_users", (req, res) => {
@@ -90,7 +95,10 @@ app.post("/register", async (req, res) => {
       res.status(500);
       throw new Error("Could not add user!");
     };
-    res.status(200).send("User account created!");
+    res.status(200).json({
+      authToken: "test",
+      message: "User account created!"
+    });
   } catch(e: any) {
     let message = "Could not register due to an unknown internal server error. Please try again later.";
     if (e instanceof Error) message = e.message;
@@ -98,8 +106,43 @@ app.post("/register", async (req, res) => {
   };
 });
 
-app.post("/login", (req, res) => {
+app.post("/login", async (req, res) => {
+  try {
+    const {username, email, password} = req.body;
+    const session = req.session;
+    
+    if ((!email && !username) || !password) {
+      res.status(400).send("Input missing!");
+    }
 
+    let targetUser: User | undefined;
+    if (email) {
+      targetUser = await prisma.user.findFirst({where: {email: email}});
+    } else if (username) {
+      targetUser = await prisma.user.findFirst({where: {username: username}});
+    }
+
+    if (targetUser) {
+      await bcrypt.compare(password, targetUser!.password, (_err: any, approved: boolean) => {
+        if (approved) {
+          if (session) {
+            session.userId = targetUser!.id;
+            session.username = targetUser!.username;
+            session.loggedin = true;                                                                    //NEEDS TO BE LOOKED INTO, IS THIS SECURE?? MAYBE USE SessionId?
+          }
+          res.status(200).json({
+            message: `Login successful! Welcome, ${targetUser?.firstName}.`
+          });
+        } else {
+          res.status(401).send("Login failed. Please check that your login information is correct.");
+        }
+      })
+    } else {
+      res.status(401).send("Login failed. User not found!");
+    }
+  } catch {
+    console.log("An error occurred while trying to log in!")
+  }
 });
 
 app.listen(PORT, () => {
