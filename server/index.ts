@@ -5,6 +5,7 @@ import e from "express";
 const { PrismaClient } = require("@prisma/client");
 const bcrypt = require("bcrypt");
 const session = require("express-session");
+const cors = require("cors");
 const saltRounds = 10;
 
 const PORT = process.env.PORT || 3001;
@@ -13,9 +14,11 @@ const app = express();
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
+app.use(cors());
 app.use(session({
-  secret: process.env.SESSION_SECRET || "TestSecret",
+  secret: process.env.SESSION_SECRET || "645hfgj-&RYUfhgh8w3r",
   resave: false,
+  saveUninitialized: true,
   cookie: {
     secure: false //Needs to be changed once https has been put in place
   }
@@ -35,27 +38,30 @@ const getUsers = async () => {
   return users;
 }
 
-app.get("/", (req, res) => {
+app.get("/api/", (req, res) => {
   console.log("Request received!");
 
   const session = req.session;
   if (session) {
-    res.send(session.loggedin ? "Hello, " + session.username + "!" : "Hello!");
+    res.json({
+      message: session.loggedin ? "Hello, " + session.username + "!" : "Hello!",
+      loggedin: session.loggedin
+    });
   } else {
-    res.status(500).send("An error occurred: Could not load session data.");
+    res.status(500).json("An error occurred: Could not load session data.");
   }
 });
 
-app.get("/get_users", (req, res) => {
+app.get("/api/users", (req, res) => {
     getUsers().then((users) => {
       res.json(users);
     }).catch((e) => {
       console.error(e.message);
-      res.status(500).send("An error occurred while getting users from database!");
+      res.status(500).json("An error occurred while getting users from database!");
     })
 });
 
-app.post("/register", async (req, res) => {
+app.post("/api/register", async (req, res) => {
   try {
     const {username, password, firstName, lastName, dateOfBirth, email} = req.body;
 
@@ -102,17 +108,18 @@ app.post("/register", async (req, res) => {
   } catch(e: any) {
     let message = "Could not register due to an unknown internal server error. Please try again later.";
     if (e instanceof Error) message = e.message;
-    res.send(message);
+    res.json(message);
   };
 });
 
-app.post("/login", async (req, res) => {
+app.post("/api/login", async (req, res) => {
   try {
     const {username, email, password} = req.body;
+    console.log(req.body);
     const session = req.session;
     
     if ((!email && !username) || !password) {
-      res.status(400).send("Input missing!");
+      res.status(400).json("Input missing!");
     }
 
     let targetUser: User | undefined;
@@ -131,14 +138,15 @@ app.post("/login", async (req, res) => {
             session.loggedin = true;                                                                    //NEEDS TO BE LOOKED INTO, IS THIS SECURE?? MAYBE USE SessionId?
           }
           res.status(200).json({
-            message: `Login successful! Welcome, ${targetUser?.firstName}.`
+            message: `Login successful! Welcome, ${targetUser?.firstName}.`,
+            loggedin: true,
           });
         } else {
-          res.status(401).send("Login failed. Please check that your login information is correct.");
+          res.status(401).json("Login failed. Please check that your login information is correct.");
         }
       })
     } else {
-      res.status(401).send("Login failed. User not found!");
+      res.status(401).json("Login failed. User not found!");
     }
   } catch {
     console.log("An error occurred while trying to log in!")

@@ -22,9 +22,9 @@ const FeedScreen = ({navigation}: any) => {
 
     return (
         <View>
-            {error && <Text style={{color: '#a83232'}}>{error}</Text>}
+            {error && <Text style={{color: '#a83232'}}>An error occurred: {error}</Text>}
             {isPending && <Text>Loading...</Text>}
-            {data &&
+            {/* {data &&
                 <FlatList 
                     data={data}
                     renderItem={({item}) => (
@@ -32,7 +32,8 @@ const FeedScreen = ({navigation}: any) => {
                     )}
                     keyExtractor={(item) => item.title}
                 />
-            }
+            } */}
+            <Text>{data}</Text>
             <Button title="Load" onPress={dataRequestPressed}></Button>
         </View>
     );
