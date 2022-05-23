@@ -1,7 +1,9 @@
-# syntax=docker/dockerfile:1
-FROM node:12-alpine
-RUN apk add --no-cache python2 g++ make
+FROM node:16-alpine
 WORKDIR /app
+COPY package*.json /app
+RUN npm install
 COPY . .
-CMD ["tsc", "node", "dist/index.js"]
 EXPOSE 3001
+ENV DATABASE_URL "postgresql://postgres:postgres@wishlist-db-postgres-new:5432/wishlist-db"
+RUN npx prisma generate
+CMD ["npm", "start"]

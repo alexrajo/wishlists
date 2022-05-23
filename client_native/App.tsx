@@ -1,7 +1,7 @@
-import MainNavigation from "./navigation/MainNavigation";
+import StackNavigation from "./navigation/StackNavigation";
 
 export default function App() {
   return (
-    <MainNavigation />
+    <StackNavigation/>
   );
 }

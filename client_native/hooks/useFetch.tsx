@@ -15,7 +15,6 @@ const useFetch = (url: RequestInfo) => {
             if (!res.ok) {
                 throw Error("Could not load data. " + res.statusText);
             }
-            console.log(res);
             return res;
         })
         .then(res => res.json())

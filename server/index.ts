@@ -7,6 +7,7 @@ const bcrypt = require("bcrypt");
 const session = require("express-session");
 const cors = require("cors");
 const saltRounds = 10;
+const illegalUsernameFormat = /[!-\/:-@[-`{-~ ]/;
 
 const PORT = process.env.PORT || 3001;
 const prisma = new PrismaClient();
@@ -38,7 +39,7 @@ const getUsers = async () => {
   return users;
 }
 
-app.get("/api/", (req, res) => {
+app.get("/api", (req, res) => {
   console.log("Request received!");
 
   const session = req.session;
@@ -68,6 +69,21 @@ app.post("/api/register", async (req, res) => {
     if (!(username && password && firstName && lastName && dateOfBirth && email)) {
       res.status(400);
       throw new Error("Missing input!");
+    }
+
+    if(username.length < 1) {
+      res.status(400);
+      throw new Error("Please enter a username!");
+    }
+
+    if(password.length < 8) {
+      res.status(400);
+      throw new Error("Password needs to be at least 8 characters long!");
+    }
+    
+    if(illegalUsernameFormat.test(username)) {
+      res.status(400);
+      throw new Error("Only letters a-z, A-Z and numbers are allowed in a username!");
     }
 
     let encryptedPassword;

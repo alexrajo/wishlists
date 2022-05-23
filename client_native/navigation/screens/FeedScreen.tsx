@@ -2,23 +2,10 @@ import { useEffect, useState } from "react";
 import { Button, FlatList, Text, View } from "react-native";
 import useFetch from "../../hooks/useFetch";
 
-// const DATA = [
-//     {
-//         title: "Hello! 1"
-//     },
-//     {
-//         title: "Hello! 2"
-//     },
-// ]
-
 const FeedScreen = ({navigation}: any) => {
 
-    const [url, setUrl] = useState("/");
+    const [url, setUrl] = useState("/api/");
     const {data, error, isPending} = useFetch(url);
-
-    const dataRequestPressed = () => {
-        setUrl("/");
-    }
 
     return (
         <View>
@@ -33,8 +20,7 @@ const FeedScreen = ({navigation}: any) => {
                     keyExtractor={(item) => item.title}
                 />
             } */}
-            <Text>{data}</Text>
-            <Button title="Load" onPress={dataRequestPressed}></Button>
+            <Text>{data && data.message}</Text>
         </View>
     );
 }
