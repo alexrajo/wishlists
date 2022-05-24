@@ -12,7 +12,7 @@ model AuthToken {
   user_id               Int
   value                 String   @db.VarChar(20)
   last_used             DateTime @db.Timestamp(6)
-  users                 User    @relation(fields: [user_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user")
+  users                 User    @relation(fields: [user_id], references: [userId], onDelete: NoAction, onUpdate: NoAction, map: "fk_user")
   @@map("auth_tokens")
 }
 
@@ -21,15 +21,15 @@ model Friendship {
   user2Id               Int @map("user2_id")
   user1Id               Int @map("user1_id")
   confirmed             Boolean
-  user1                 User   @relation("friendships_user1_idTousers", fields: [user1Id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user1") //initiating user
-  user2                 User   @relation("friendships_user2_idTousers", fields: [user2Id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_user2") //request-receiving user
+  user1                 User   @relation("friendships_user1_idTousers", fields: [user1Id], references: [userId], onDelete: NoAction, onUpdate: NoAction, map: "fk_user1") //initiating user
+  user2                 User   @relation("friendships_user2_idTousers", fields: [user2Id], references: [userId], onDelete: NoAction, onUpdate: NoAction, map: "fk_user2") //request-receiving user
 
   @@ignore
   @@map("friendships")
 }
 
 model User {
-  id                         Int           @id @default(autoincrement())
+  userId                     Int           @id @default(autoincrement()) @map("user_id")
   username                   String        @db.VarChar(20) @unique
   password                   String        @db.Char(60)
   firstName                  String        @db.VarChar(25)    @map("first_name")
@@ -45,12 +45,12 @@ model User {
 }
 
 model Wishlist {
-  id                    BigInt  @id @default(autoincrement())
+  wishlistId            BigInt  @id @default(autoincrement()) @map("wishlist_id")
   ownerId               Int @map("owner_id")
   title                 String  @db.VarChar(25)
   description           String? @db.VarChar(128)
   list                  Json
-  users                 User   @relation(fields: [ownerId], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "fk_owner")
+  users                 User   @relation(fields: [ownerId], references: [userId], onDelete: NoAction, onUpdate: NoAction, map: "fk_owner")
 
   @@map("wishlists")
 }
