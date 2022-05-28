@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 
-const api_endpoint = process.env.API_ENDPOINT || "http://localhost:3001";
-
 const useFetch = (url: RequestInfo) => {
     const [isPending, setIsPending] = useState(false);
     const [error, setError] = useState<String|null>(null);
@@ -10,7 +8,7 @@ const useFetch = (url: RequestInfo) => {
     useEffect(() => {
         setIsPending(true);
         setError(null);
-        fetch(api_endpoint + url)
+        fetch(url)
         .then(res => {
             if (!res.ok) {
                 throw Error("Could not load data. " + res.statusText);
@@ -18,8 +16,8 @@ const useFetch = (url: RequestInfo) => {
             return res;
         })
         .then(res => res.json())
-        .then(formattedData => {
-            setData(formattedData);
+        .then(content => {
+            setData(content);
         })
         .catch(err => {
             setError(err.message);

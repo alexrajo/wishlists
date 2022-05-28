@@ -30,29 +30,24 @@ const Tab = createBottomTabNavigator();
 
 const TabNavigation = () => {
   return (
-    <div>
-      <SafeAreaView>
-        <StatusBar barStyle="dark-content" />
-      </SafeAreaView>
-      <Tab.Navigator
-        screenOptions={({ route }) => ({
-          tabBarIcon: ({ focused, color, size }) => {
-            const iconInformation: ItemIconConfigurationType =
-              IconConfiguration[route.name] || IconConfiguration.Fallback;
-            const iconName: any = focused
-              ? iconInformation.focus
-              : iconInformation.normal;
-            return <Ionicons name={iconName} size={size} color={color} />;
-          },
-          tabBarActiveTintColor: "#444",
-          tabBarInactiveTintColor: "#AAA",
-        })}
-      >
-        <Tab.Screen name="Home" component={FeedScreen} />
-        <Tab.Screen name="Create" component={CreateScreen} />
-        <Tab.Screen name="Profile" component={ProfileScreen} />
-      </Tab.Navigator>
-    </div>
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        tabBarIcon: ({ focused, color, size }) => {
+          const iconInformation: ItemIconConfigurationType =
+            IconConfiguration[route.name] || IconConfiguration.Fallback;
+          const iconName: any = focused
+            ? iconInformation.focus
+            : iconInformation.normal;
+          return <Ionicons name={iconName} size={size} color={color} />;
+        },
+        tabBarActiveTintColor: "#444",
+        tabBarInactiveTintColor: "#AAA",
+      })}
+    >
+      <Tab.Screen name="Home" component={FeedScreen} />
+      <Tab.Screen name="Create" component={CreateScreen} />
+      <Tab.Screen name="Profile" component={ProfileScreen} />
+    </Tab.Navigator>
   );
 };
 

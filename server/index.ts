@@ -175,7 +175,7 @@ app.post("/api/register", async (req, res) => {
       lastName: lastName,
       dateOfBirth: new Date(dateOfBirth),
       email: email,
-      authLevel: 0
+      authLevel: 0,
     };
 
     const newUser = await addUser(newUserData);
@@ -203,12 +203,24 @@ app.post("/api/register", async (req, res) => {
 
 app.post("/api/login", async (req, res) => {
   try {
-    const { username, email, password } = req.body;
-    console.log(req.body);
+    const { sessionAuth, username, email, password } = req.body;
     const session = req.session;
 
+    if (sessionAuth) {
+      if (session && session.loggedin && session.user) {
+        res.status(200).json({
+          message: `Welcome, ${session.user.firstName}.`,
+          loggedin: true,
+        });
+        return;
+      }
+      res.status(401).json("Not logged in");
+      return;
+    }
+
     if ((!email && !username) || !password) {
-      res.status(400).json("Input missing!");
+        res.status(400).json("Input missing!");
+        return;
     }
 
     let targetUser: User | undefined;
@@ -234,20 +246,24 @@ app.post("/api/login", async (req, res) => {
               message: `Login successful! Welcome, ${targetUser?.firstName}.`,
               loggedin: true,
             });
+            return;
           } else {
             res
               .status(401)
               .json(
                 "Login failed. Please check that your login information is correct."
               );
+            return;
           }
         }
       );
     } else {
       res.status(401).json("Login failed. User not found!");
+      return;
     }
-  } catch {
-    console.log("An error occurred while trying to log in!");
+  } catch (e) {
+    console.log("An error occurred while trying to log in!", e);
+    res.status(500).json("An internal server error occurred while trying to log in!");
   }
 });
 
