@@ -10,6 +10,7 @@ CREATE TABLE users (
     last_name VARCHAR(25) NOT NULL,
     date_of_birth DATE NOT NULL,
     email VARCHAR(254) NOT NULL,
+    auth_level SMALLINT DEFAULT 0,
     PRIMARY KEY(user_id)
 );
 

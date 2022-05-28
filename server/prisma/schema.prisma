@@ -36,6 +36,7 @@ model User {
   lastName                   String        @db.VarChar(25)    @map("last_name")
   dateOfBirth                DateTime      @db.Date           @map("date_of_birth")
   email                      String?       @db.VarChar(254) @unique
+  authLevel                  Int           @db.SmallInt @map("auth_level")
   auth_tokens                AuthToken[]
   friendships_as_user1       Friendship[] @relation("friendships_user1_idTousers") @ignore
   friendships_as_user2       Friendship[] @relation("friendships_user2_idTousers") @ignore

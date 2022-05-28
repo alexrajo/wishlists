@@ -7,7 +7,7 @@ docker container rm wishlist-db-postgres-new
 cd ./server/
 docker build --rm --no-cache -t wishlist-app-node-backend ./
 cd ../database/
-docker build --rm --no-cache -t wishlist-postgres-db
+docker build --rm --no-cache -t wishlist-postgres-db ./
 
 cd ..
 docker run -d --name wishlist-db-postgres-new -p 5432:5432 -v wishlist-psql-data:/var/lib/postgresql/data --network wishlist-net wishlist-postgres-db

@@ -2,6 +2,7 @@ import express from "express";
 import { Prisma, User } from "@prisma/client";
 import e from "express";
 import { env } from "process";
+import { Session } from "inspector";
 
 const { PrismaClient } = require("@prisma/client");
 const bcrypt = require("bcrypt");
@@ -13,6 +14,8 @@ const illegalUsernameFormat = /[!-\/:-@[-`{-~ ]/;
 const PORT = process.env.PORT || 3001;
 const prisma = new PrismaClient();
 const app = express();
+
+const ADMIN_AUTH_LEVEL = process.env.ADMIN_AUTH_LEVEL || 100;
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -31,7 +34,7 @@ app.use(
 const addWishlist = async () => {};
 
 const addUser = async (user: Prisma.UserCreateInput) => {
-  const newUser = await prisma.user.create({
+  const newUser: User = await prisma.user.create({
     data: user,
   });
   return newUser;
@@ -42,13 +45,24 @@ const getUsers = async () => {
   return users;
 };
 
+const getUserById = async (userId: number) => {
+  const user: User = await prisma.user.findUnique({
+    where: {
+      userId: userId,
+    },
+  });
+  return user;
+};
+
 app.get("/api", (req, res) => {
   console.log("Request received! DB ULR: " + process.env.DATABASE_URL);
 
   const session = req.session;
   if (session) {
     res.json({
-      message: session.loggedin ? "Hello, " + session.username + "!" : "Hello!",
+      message: session.loggedin
+        ? "Hello, " + session.user.username + "!"
+        : "Hello!",
       loggedin: session.loggedin,
     });
   } else {
@@ -56,18 +70,53 @@ app.get("/api", (req, res) => {
   }
 });
 
+app.get("/api/user", async (req, res) => {
+  const session = req.session;
+
+  try {
+    if (req.query && req.query.userId) {
+      const selectedId = parseInt(req.query.userId as string);
+      let userData = await getUserById(selectedId);
+      userData.password = "";
+
+      if (session && session.loggedin && session.user.userId === selectedId) {
+        res.status(200).json(userData);
+      } else {
+        userData.email = "";
+        userData.lastName = "";
+        res.status(200).json(userData);
+      }
+    } else {
+      res.status(400).json("Missing userId in query!");
+    }
+  } catch {
+    console.log("An error occurred while trying to fetch user.");
+  }
+});
+
 app.get("/api/users", (req, res) => {
-  console.log("GETTING USERS, DB_URL: " + process.env.DATABASE_URL);
-  getUsers()
-    .then((users) => {
-      res.json(users);
-    })
-    .catch((e) => {
-      console.error(e.message);
-      res
-        .status(500)
-        .json("An error occurred while getting users from database!");
-    });
+  const session = req.session;
+  if (
+    session &&
+    session.loggedin &&
+    session.user &&
+    session.user.authLevel >= ADMIN_AUTH_LEVEL
+  ) {
+    console.log("GETTING USERS, DB_URL: " + process.env.DATABASE_URL);
+    getUsers()
+      .then((users) => {
+        res.json(users);
+      })
+      .catch((e) => {
+        console.error(e.message);
+        res
+          .status(500)
+          .json("An error occurred while getting users from database!");
+      });
+  } else {
+    console.log(session);
+    res.status(401).json("Could not authorize. Request denied.");
+  }
 });
 
 app.post("/api/register", async (req, res) => {
@@ -119,21 +168,29 @@ app.post("/api/register", async (req, res) => {
       );
     }
 
-    const newUser = {
+    const newUserData = {
       username: username,
       password: encryptedPassword,
       firstName: firstName,
       lastName: lastName,
       dateOfBirth: new Date(dateOfBirth),
       email: email,
+      authLevel: 0
     };
 
-    if (!addUser(newUser)) {
+    const newUser = await addUser(newUserData);
+    if (!newUser) {
       res.status(500);
       throw new Error("Could not add user!");
     }
+
+    const session = req.session;
+    if (session) {
+      session.loggedin = true;
+      session.user = newUser;
+    }
+
     res.status(200).json({
-      authToken: "test",
       message: "User account created!",
     });
   } catch (e: any) {
@@ -170,9 +227,8 @@ app.post("/api/login", async (req, res) => {
         (_err: any, approved: boolean) => {
           if (approved) {
             if (session) {
-              session.userId = targetUser!.userId;
-              session.username = targetUser!.username;
-              session.loggedin = true; //NEEDS TO BE LOOKED INTO, IS THIS SECURE?? MAYBE USE SessionId?
+              session.loggedin = true;
+              session.user = targetUser!;
             }
             res.status(200).json({
               message: `Login successful! Welcome, ${targetUser?.firstName}.`,
