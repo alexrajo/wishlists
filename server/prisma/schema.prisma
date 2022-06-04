@@ -35,11 +35,11 @@ model User {
 }
 
 model Wishlist {
-  wishlistId  BigInt   @id @default(autoincrement()) @map("wishlist_id")
-  ownerId     Int      @map("owner_id")
-  title       String   @db.VarChar(25)
-  description String?  @db.VarChar(128)
-  list        String[] @db.VarChar(50)
+  wishlistId  BigInt  @id @default(autoincrement()) @map("wishlist_id")
+  ownerId     Int     @map("owner_id")
+  title       String  @db.VarChar(25)
+  description String? @db.VarChar(128)
+  content     Json
 
   @@map("wishlists")
 }

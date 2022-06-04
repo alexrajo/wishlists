@@ -1,5 +1,5 @@
-import { Request, Response, NextFunction } from "express";
-import { PrismaClient, User } from "@prisma/client";
+import { Request, Response, NextFunction, json, urlencoded } from "express";
+import { PrismaClient, User, Friendship } from "@prisma/client";
 import { AuthenticationRequest, AuthorizationRequest, SignedUserData } from "../config/types";
 
 const illegalUsernameFormat = /[!-\/:-@[-`{-~ ]/;
@@ -57,8 +57,73 @@ export const retrieveUserLists = async (req: AuthorizationRequest, res: Response
                 ownerId: user.userId,
             }
         });
-        return res.status(200).json(lists);
+        const formattedLists = JSON.stringify(lists, (_key, value) => typeof value === "bigint" ? value.toString() : value);
+        return res.status(200).json(JSON.parse(formattedLists));
     } catch (e) {
+        console.error(e);
+        return res.sendStatus(500);
+    }
+}
+
+export const getFriends = async (req: AuthorizationRequest, res: Response) => {
+    const user = req.user;
+    if (!user) return res.sendStatus(401);
+
+    try {
+        const friendships = await prisma.friendship.findMany({
+            where: {
+                confirmed: true,
+                OR: [
+                    {initiatorId: user.userId},
+                    {receiverId: user.userId},
+                 ]
+            }
+        });
+        const friendIds = friendships.map(
+            (friendship: Friendship) => friendship.initiatorId == user.userId ? friendship.receiverId : friendship.initiatorId
+        );
+        const friends = await prisma.user.findMany({
+            where: {
+                userId: {in: friendIds},
+            },
+            select: {
+                userId: true,
+                username: true,
+                firstName: true,
+                lastName: true,
+            }
+        });
+        const formattedLists = JSON.stringify(friends, (_key, value) => typeof value === "bigint" ? value.toString() : value);
+        return res.status(200).json(JSON.parse(formattedLists));
+    } catch (e) {
+        console.error(e);
+        return res.sendStatus(500);
+    }
+}
+
+export const getOwnProfile = async (req: AuthorizationRequest, res: Response) => {
+    const signedUserData = req.user;
+    if (!signedUserData) return res.sendStatus(401);
+
+    try {
+        const user = await prisma.user.findUnique({
+            where: {
+                userId: signedUserData.userId,
+            },
+            select: {
+                username: true,
+                firstName: true,
+                lastName: true,
+                dateOfBirth: true,
+                email: true,
+                userRoles: true,
+            }
+        });
+        if (!user) return res.status(500).send("An unknown error occurred while trying to find user info.");
+
+        return res.status(200).json(user);
+    } catch (e) {
+        console.error(e);
         return res.sendStatus(500);
     }
 }
@@ -97,4 +162,23 @@ export const registerUser = async (req: Request, res: Response) => {
         console.error(e);
         return res.sendStatus(500);
     }
+}
+
+export const createWishlist = async (req: AuthorizationRequest, res: Response) => {
+    const { title, description, content } = req.body;
+    if (!title) return res.sendStatus(400);
+
+    const user = req.user;
+    if(!user) return res.sendStatus(500);
+
+    const newWishlist = await prisma.wishlist.create({
+        data: {
+            ownerId: user.userId,
+            title: title,
+            description: description,
+            content: content,
+        }
+    });
+    if (!newWishlist) return res.sendStatus(500);
+    return res.status(200).send("Wishlist created!");
 }

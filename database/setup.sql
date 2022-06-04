@@ -19,7 +19,7 @@ CREATE TABLE wishlists (
     owner_id INTEGER NOT NULL,
     title VARCHAR(25) NOT NULL,
     description VARCHAR(128),
-    list VARCHAR(50) ARRAY NOT NULL,
+    content JSONB NOT NULL,
     PRIMARY KEY(wishlist_id)
 );
 

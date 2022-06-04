@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction, Application } from "express";
 import { AuthorizationRequest } from "../config/types";
 import {authorizeToken, authenticateUser, refreshToken} from "../middleware/auth";
-import {retrieveUserLists, getUserFromLoginInformation, registerUser} from "../middleware/dbManager";
+import {retrieveUserLists, getUserFromLoginInformation, registerUser, createWishlist, getFriends, getOwnProfile} from "../middleware/dbManager";
 
 export default (app: Application) => {
 
@@ -13,13 +13,14 @@ export default (app: Application) => {
     app.post("/api/login", getUserFromLoginInformation, authenticateUser);
     app.post("/api/refreshtoken", refreshToken);
     app.post("/api/register", registerUser);
-    app.post("/api/createlist", authorizeToken, (req: AuthorizationRequest, res: Response, next: NextFunction) => {
-        const { title, description, content } = req.body;
-        if (!title) res.sendStatus(400);
-        res.sendStatus(404);
-    });
+    app.post("/api/createlist", authorizeToken, createWishlist);
 
     app.get("/api/mylists", authorizeToken, retrieveUserLists);
+    app.get("/api/friends", authorizeToken, getFriends);
+    app.get("/api/myprofile", authorizeToken, getOwnProfile);
+    app.get("api/feed", (req: Request, res: Response) => {
+        res.sendStatus(404);
+    });
 
     app.get("/api/", (req: Request, res: Response) => {
         console.log("Request received!");
