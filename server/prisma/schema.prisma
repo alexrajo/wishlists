@@ -1,0 +1,63 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Friendship {
+  friendshipId BigInt  @id @default(autoincrement()) @map("friendship_id")
+  initiatorId  Int     @map("user1_id")
+  receiverId   Int     @map("user2_id")
+  confirmed    Boolean
+  initiator    User    @relation("friendships_user1_idTousers", fields: [initiatorId], references: [userId], onDelete: NoAction, onUpdate: NoAction, map: "fk_user1")
+  receiver     User    @relation("friendships_user2_idTousers", fields: [receiverId], references: [userId], onDelete: NoAction, onUpdate: NoAction, map: "fk_user2")
+
+  @@map("friendships")
+}
+
+model User {
+  userId                 Int          @id @default(autoincrement()) @map("user_id")
+  username               String       @unique @db.VarChar(20)
+  password               String       @db.Char(60)
+  firstName              String       @map("first_name") @db.VarChar(25)
+  lastName               String       @map("last_name") @db.VarChar(25)
+  dateOfBirth            DateTime     @map("date_of_birth") @db.Date
+  email                  String?      @unique @db.VarChar(254)
+  token                  String?      @db.VarChar(256)
+  friendshipsAsInitiator Friendship[] @relation("friendships_user1_idTousers")
+  friendshipsAsReceiver  Friendship[] @relation("friendships_user2_idTousers")
+  userRoles              UserRole[]   @relation("user_rolesTousers")
+
+  @@map("users")
+}
+
+model Wishlist {
+  wishlistId  BigInt   @id @default(autoincrement()) @map("wishlist_id")
+  ownerId     Int      @map("owner_id")
+  title       String   @db.VarChar(25)
+  description String?  @db.VarChar(128)
+  list        String[] @db.VarChar(50)
+
+  @@map("wishlists")
+}
+
+model Role {
+  name      String     @id @db.VarChar(16)
+  userRoles UserRole[]
+
+  @@map("roles")
+}
+
+model UserRole {
+  userRoleId     BigInt    @id @default(autoincrement()) @map("user_roles_id")
+  userId         Int       @map("user_id")
+  rolename       String    @db.VarChar(16)
+  expirationDate DateTime? @map("expiration_date") @db.Date
+  role           Role      @relation(fields: [rolename], references: [name], onDelete: NoAction, onUpdate: NoAction, map: "fk_role")
+  user           User      @relation("user_rolesTousers", fields: [userId], references: [userId], onDelete: NoAction, onUpdate: NoAction, map: "fk_user")
+
+  @@map("user_roles")
+}
