@@ -14,6 +14,9 @@ export default (app: Application) => {
     app.post("/api/refreshtoken", refreshToken);
     app.post("/api/register", registerUser);
     app.post("/api/createlist", authorizeToken, createWishlist);
+    app.post("/api/init", authorizeToken, (req: Request, res: Response) => {
+        res.sendStatus(200);
+    });
 
     app.get("/api/mylists", authorizeToken, retrieveUserLists);
     app.get("/api/friends", authorizeToken, getFriends);
