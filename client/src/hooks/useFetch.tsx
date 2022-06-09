@@ -1,15 +1,19 @@
 import { useEffect, useState } from "react";
 
-const useFetch = (url: RequestInfo) => {
+const useFetch = (req?: RequestInfo) => {
     const [isPending, setIsPending] = useState(false);
     const [error, setError] = useState<String|null>(null);
     const [data, setData] = useState<any>(null); //Change type from any
+    const [statusCode, setStatusCode] = useState<number>();
 
-    useEffect(() => {
+    const doFetch = () => {
+        if (!req) return;
+
         setIsPending(true);
         setError(null);
-        fetch(url)
+        fetch(req)
         .then(res => {
+            setStatusCode(res.status);
             if (!res.ok) {
                 throw Error("Could not load data. " + res.statusText);
             }
@@ -25,9 +29,11 @@ const useFetch = (url: RequestInfo) => {
         .finally(() => {
             setIsPending(false);
         });
-    }, [url]);
+    }
 
-    return {data, isPending, error};
+    useEffect(doFetch, [req]);
+
+    return {data, isPending, error, statusCode, doFetch};
 }
 
 export default useFetch;

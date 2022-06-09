@@ -128,7 +128,7 @@ export const getOwnProfile = async (req: AuthorizationRequest, res: Response) =>
     }
 }
 
-export const registerUser = async (req: Request, res: Response) => {
+export const registerUser = async (req: AuthenticationRequest, res: Response, next: NextFunction) => {
     try {
         const {username, password, firstName, lastName, dateOfBirth, email} = req.body;
         if (!(username && password && firstName && lastName && dateOfBirth)) return res.status(400).send("Missing input!");
@@ -157,7 +157,8 @@ export const registerUser = async (req: Request, res: Response) => {
             }
         });
 
-        res.status(200).send("User account created!");
+        req.user = newUser;
+        next();
     } catch(e) {
         console.error(e);
         return res.sendStatus(500);
