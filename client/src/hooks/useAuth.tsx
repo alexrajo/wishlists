@@ -1,11 +1,12 @@
 import { useEffect, useState, useContext, createContext, Component } from "react"
 import * as SecureStore from 'expo-secure-store';
-import useFetch from "./useFetch";
 
 const refreshTokenSecureStoreKey = "refreshToken";
 const AuthContext = createContext({
     loggedIn: false,
     isPending: true,
+    error: "",
+    authToken: "",
     login: (username: string, password: string) => {},
     signup: (signUpData: SignUpData) => {},
     refreshAuthToken: () => {},
@@ -24,16 +25,17 @@ export const ProvideAuth = ({children}: any) => {
 const useProvideAuth = () => {
     const [loggedIn, setLoggedIn] = useState(false);
     const [authToken, setAuthToken] = useState("");
-    const [refreshToken, setRefreshToken] = useState(getValueFromKey(refreshTokenSecureStoreKey));
+    const [refreshToken, setRefreshToken] = useState<string | null>();
     const [error, setError] = useState("");
     const [isPending, setIsPending] = useState(false);
     
     const login = (username: string, password: string) => {
         setIsPending(true);
-        fetch("/api/login", {
+        fetch("http://10.0.0.26:3001/api/login", {
             method: "POST",
             mode: "cors",
             headers: {
+                "Accept": "*/*",
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
@@ -45,9 +47,8 @@ const useProvideAuth = () => {
                 return res.json();
             }
             throw new Error("Could not authenticate!");
-        }).then(data => {
+        }).then((data: AuthResponse) => {
             setRefreshToken(data.refreshToken);
-            setAuthToken(data.authToken);
             setLoggedIn(true);
         })
         .catch(e => {
@@ -60,7 +61,7 @@ const useProvideAuth = () => {
 
     const signup = (signUpData: SignUpData) => {
         setIsPending(true);
-        fetch("/api/login", {
+        fetch("http://10.0.0.26:3001/api/login", {
             method: "POST",
             mode: "cors",
             headers: {
@@ -87,11 +88,11 @@ const useProvideAuth = () => {
 
     const refreshAuthToken = () => {
         setIsPending(true);
-        fetch("/api/refreshtoken", {
+        fetch("http://10.0.0.26:3001/api/refreshtoken", {
             method: "POST",
             mode: "cors",
             headers: {
-                "Authentication": `JWT ${refreshToken}`
+                "Authorization": `JWT ${refreshToken}`
             },
         }).then(res => {
             if (res.ok) {
@@ -109,6 +110,17 @@ const useProvideAuth = () => {
             setIsPending(false);
         });
     }
+
+    useEffect(() => {
+        refreshAuthToken();
+        if (refreshToken) {
+            SecureStore.setItemAsync(refreshTokenSecureStoreKey, refreshToken);
+        }
+    }, [refreshToken]);
+
+    useEffect(() => {
+        getValueFromKey(refreshTokenSecureStoreKey).then(setRefreshToken);
+    }, []);
 
     return {loggedIn, authToken, error, isPending, login, signup, refreshAuthToken}
 }

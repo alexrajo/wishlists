@@ -5,7 +5,6 @@ import LandingScreen from "./pages/LandingScreen";
 import TabNavigator from "./pages/TabNavigator";
 import { View } from "react-native";
 
-
 const Stack = createStackNavigator();
 
 const StackNavigator = () => {

@@ -12,15 +12,17 @@ const saltRounds = 10;
 const AUTH_TOKEN_SECRET = process.env.AUTH_TOKEN_SECRET;
 const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
 
-const getAuthToken = (req: AuthorizationRequest, res: Response) => {
+export const getAuthToken = (req: AuthorizationRequest, res: Response, next: NextFunction) => {
     const headers = req.headers;
     const authHeader = headers["authorization"];
+    console.log(authHeader);
     if (!authHeader) return res.sendStatus(400);
 
     const token = authHeader.split(" ")[1];
     if (!token) return res.status(401).send("Could not find token!");
 
-    return token;
+    req.token = token;
+    next();
 }
 
 const userDataToSignableUserData = (user: User): SignedUserData => {
@@ -36,42 +38,49 @@ export const authenticateUser = async (req: AuthenticationRequest, res: Response
         const {password} = req.body;
         if (!user || !password) return res.sendStatus(400);
 
-        const passwordMatches = bcrypt.compare(password, user.password);
-        if (passwordMatches) {
+        const passwordMatches = await bcrypt.compare(password, user.password);
+        if (passwordMatches === true) {
             const dataToSign: SignedUserData = userDataToSignableUserData(user);
 
-            const newRefreshToken = jwt.sign(dataToSign, REFRESH_TOKEN_SECRET, {expiresIn: "14d"});
-            const newAuthToken = jwt.sign(dataToSign, AUTH_TOKEN_SECRET, {expiresIn: "15m"});
-            await setUserRefreshToken(user, newRefreshToken);
+            try {
+                const newRefreshToken = jwt.sign(dataToSign, REFRESH_TOKEN_SECRET, {expiresIn: "14d"});
+                const newAuthToken = jwt.sign(dataToSign, AUTH_TOKEN_SECRET, {expiresIn: "15m"});
+                await setUserRefreshToken(user, newRefreshToken);
 
-            return res.status(200).json({
-                refreshToken: newRefreshToken,
-                authToken: newAuthToken,
-            });
+                return res.status(200).json({
+                    refreshToken: newRefreshToken,
+                    authToken: newAuthToken,
+                });
+            } catch {
+                return res.status(500).send("Error while trying to sign authentication token!");
+            }
+        } else {
+            return res.sendStatus(401);
         }
     } catch {
-        res.sendStatus(500);
+        return res.status(500).send("Error while trying to authenticate user.");
     }
 }
 
 export const authorizeToken = (req: AuthorizationRequest, res: Response, next: NextFunction) => {
     try {
-        const token = getAuthToken(req, res);
+        const token = req.token;
         jwt.verify(token, AUTH_TOKEN_SECRET, (err: JsonWebTokenError, user: SignedUserData) => {
             if (err) return res.status(401).send("Could not verify token!");
             
             req.user = user;
             next();
-        })
-    } catch {
-        return res.sendStatus(500);
+        });
+        return;
+    } catch (e) {
+        return res.status(500).send(e);
     }
 }
 
 export const refreshToken = async (req: AuthorizationRequest, res: Response) => {
     try {
-        const refreshToken = getAuthToken(req, res);
-        jwt.verify(refreshToken, REFRESH_TOKEN_SECRET, async (err: JsonWebTokenError, data: SignedUserData) => {
+        const refreshToken = req.token;
+        await jwt.verify(refreshToken, REFRESH_TOKEN_SECRET, async (err: JsonWebTokenError, data: SignedUserData) => {
             if (err) return res.status(401).send("Could not verify token!");
             
             const user = await getUserFromSignedData(data);

@@ -43,7 +43,7 @@ export const getUserFromLoginInformation = async (req: AuthenticationRequest, re
         })
         next();
     } catch {
-        res.sendStatus(500);
+        res.status(500).send("Could not get user from login information. Check that the info you put in is correct.");
     }
 }
 
@@ -177,7 +177,6 @@ export const createWishlist = async (req: AuthorizationRequest, res: Response) =
             ownerId: user.userId,
             title: title,
             description: description,
-            content: content,
         }
     });
     if (!newWishlist) return res.sendStatus(500);

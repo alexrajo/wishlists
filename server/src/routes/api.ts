@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction, Application } from "express";
 import { AuthorizationRequest } from "../config/types";
-import {authorizeToken, authenticateUser, refreshToken} from "../middleware/auth";
+import {authorizeToken, authenticateUser, refreshToken, getAuthToken} from "../middleware/auth";
 import {retrieveUserLists, getUserFromLoginInformation, registerUser, createWishlist, getFriends, getOwnProfile} from "../middleware/dbManager";
 
 export default (app: Application) => {
@@ -11,23 +11,23 @@ export default (app: Application) => {
     });
 
     app.post("/api/login", getUserFromLoginInformation, authenticateUser);
-    app.post("/api/refreshtoken", refreshToken);
+    app.post("/api/refreshtoken", getAuthToken, refreshToken);
     app.post("/api/register", registerUser, authenticateUser);
-    app.post("/api/createlist", authorizeToken, createWishlist);
-    app.post("/api/init", authorizeToken, (req: Request, res: Response) => {
-        res.sendStatus(200);
+    app.post("/api/createlist", getAuthToken, authorizeToken, createWishlist);
+    app.post("/api/init", getAuthToken, authorizeToken, (req: Request, res: Response) => {
+        return res.sendStatus(200);
     });
 
-    app.get("/api/mylists", authorizeToken, retrieveUserLists);
-    app.get("/api/friends", authorizeToken, getFriends);
-    app.get("/api/myprofile", authorizeToken, getOwnProfile);
-    app.get("api/feed", (req: Request, res: Response) => {
-        res.sendStatus(404);
+    app.get("/api/mylists", getAuthToken, authorizeToken, retrieveUserLists);
+    app.get("/api/friends", getAuthToken, authorizeToken, getFriends);
+    app.get("/api/myprofile", getAuthToken, authorizeToken, getOwnProfile);
+    app.get("/api/feed", (req: Request, res: Response) => {
+        return res.sendStatus(404);
     });
 
     app.get("/api/", (req: Request, res: Response) => {
         console.log("Request received!");
-        res.sendStatus(200);
+        return res.sendStatus(200);
     });
 
 }

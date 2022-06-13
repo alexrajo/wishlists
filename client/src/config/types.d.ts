@@ -6,3 +6,14 @@ interface SignUpData {
     password: string,
     dateOfBirth: string,
 }
+
+interface Wishlist {
+    wishlistId: number,
+    title: string,
+    description?: string,
+}
+
+interface AuthResponse {
+    authToken?: string,
+    refreshToken?: string,
+}

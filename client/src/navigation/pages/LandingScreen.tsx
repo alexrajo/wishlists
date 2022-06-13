@@ -11,8 +11,11 @@ import {
 } from "native-base";
 import { useContext, useEffect, useState } from "react";
 import { ImageBackground, StyleSheet } from "react-native";
+import useAuth from "../../hooks/useAuth";
 
 const LandingScreen = (props: any) => {
+
+  const {loggedIn} = useAuth();
 
   const onGoToRegisterScreenPressed = () => {
     props.navigation.navigate("Register");
@@ -21,6 +24,10 @@ const LandingScreen = (props: any) => {
   const onGoToLoginScreenPressed = () => {
     props.navigation.navigate("Login");
   };
+
+  useEffect(() => {
+    if (loggedIn) props.navigation.navigate("Tabs");
+  }, [loggedIn]);
 
   return (
     <View style={styles.container}>

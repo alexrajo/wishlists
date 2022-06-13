@@ -19,8 +19,23 @@ CREATE TABLE wishlists (
     owner_id INTEGER NOT NULL,
     title VARCHAR(25) NOT NULL,
     description VARCHAR(128),
-    content JSONB NOT NULL,
     PRIMARY KEY(wishlist_id)
+);
+
+CREATE TABLE items (
+    item_id BIGINT GENERATED ALWAYS AS IDENTITY,
+    wishlist_id BIGINT NOT NULL,
+    name VARCHAR(32) NOT NULL,
+    claimed_by_user_id INTEGER,
+    
+    PRIMARY KEY(item_id),
+    CONSTRAINT fk_wishlist
+        FOREIGN KEY(wishlist_id)
+            REFERENCES wishlists(wishlist_id),
+
+    CONSTRAINT fk_claimed_by_user
+        FOREIGN KEY(claimed_by_user_id)
+            REFERENCES users(user_id)
 );
 
 CREATE TABLE friendships (
@@ -65,5 +80,8 @@ INSERT INTO roles (name) VALUES ('user');
 INSERT INTO roles (name) VALUES ('admin');
 INSERT INTO user_roles (user_id, rolename) VALUES (1, 'user');
 INSERT INTO user_roles (user_id, rolename) VALUES (1, 'admin');
+INSERT INTO wishlists (owner_id, title, description) VALUES (1, 'Test-list', 'This is a test list');
+INSERT INTO items (wishlist_id, name) VALUES (1, 'Test item #1');
+INSERT INTO items (wishlist_id, name) VALUES (1, 'Test item #2');
 
 COMMIT;

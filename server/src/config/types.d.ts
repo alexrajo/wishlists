@@ -12,4 +12,5 @@ export interface AuthenticationRequest extends Request {
 
 export interface AuthorizationRequest extends Request {
     user?: SignedUserData | null;
+    token?: string;
 }

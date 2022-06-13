@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
+import useAuth from "./useAuth";
 
 const useFetch = (req?: RequestInfo) => {
+    const {refreshAuthToken} = useAuth();
     const [isPending, setIsPending] = useState(false);
     const [error, setError] = useState<String|null>(null);
     const [data, setData] = useState<any>(null); //Change type from any
@@ -15,6 +17,9 @@ const useFetch = (req?: RequestInfo) => {
         .then(res => {
             setStatusCode(res.status);
             if (!res.ok) {
+                if (res.status == 401) {
+                    refreshAuthToken();
+                }
                 throw Error("Could not load data. " + res.statusText);
             }
             return res;
