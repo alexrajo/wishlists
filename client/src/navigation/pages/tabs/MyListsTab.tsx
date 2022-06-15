@@ -1,13 +1,14 @@
-import { View, Heading, Text, FlatList, Box, Button, Center, ChevronRightIcon, Skeleton, VStack } from "native-base";
-import React, { useState } from "react";
-import { ListRenderItemInfo, Pressable, StyleSheet } from "react-native";
+import { View, Heading, Text, FlatList, Box, Button, Center, ChevronRightIcon, Skeleton, VStack, ScrollView, Spacer } from "native-base";
+import React, { useEffect, useState } from "react";
+import { ListRenderItemInfo, Pressable, RefreshControl, StyleSheet } from "react-native";
 import useAuth from "../../../hooks/useAuth";
 import useFetch from "../../../hooks/useFetch";
 
 const MyListsTab = () => {
     const {authToken} = useAuth();
-    const [request, setRequest] = useState(
-        new Request(
+
+    const newRequestObject = () => {
+        return new Request(
             "http://10.0.0.26:3001/api/mylists",
             {
                 method: "GET",
@@ -18,22 +19,37 @@ const MyListsTab = () => {
                     "Authorization": `JWT ${authToken}`,
                 }
             }
-        )
-    );
-    const {data, error: fetchError, isPending} = useFetch(request);
+        );
+    }
+
+    const [request, setRequest] = useState(newRequestObject());
+    const {data, error: fetchError, isPending, refresh} = useFetch(request);
+
+    useEffect(() => {
+        setRequest(newRequestObject());
+    }, [authToken]);
 
     return (
         <View>
             <Center>
-                {isPending && wishlistPreviewSkeleton()}
+                {/*isPending && wishlistPreviewSkeleton()*/}
                 {fetchError && <Text color={"red.500"}>{fetchError}</Text>}
                 {data && data.length < 1 && <Text>Looks like you haven't made any wishlists yet. Create one now!</Text>}
 
-                {(!isPending && !fetchError && data && data.length > 0) && 
-                    <FlatList style={styles.list} data={data} renderItem={renderListPreview} keyExtractor={item => item.wishlistId.toString()}/>
+                {!fetchError ?
+                <>
+                    <FlatList 
+                        style={styles.list} 
+                        data={data} 
+                        renderItem={renderListPreview} 
+                        keyExtractor={item => item.wishlistId.toString()}
+                        refreshControl={<RefreshControl refreshing={isPending} onRefresh={refresh}/>}
+                        height="100%"
+                    />
+                    {!isPending && <Button style={styles.floatingButton}>CREATE NEW</Button>}
+                </>
+                : <Button onPress={refresh}>Try again</Button>
                 }
-
-                <Button style={styles.floatingButton}>CREATE NEW</Button>
             </Center>
         </View>
     );

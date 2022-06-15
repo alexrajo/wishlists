@@ -3,7 +3,6 @@ import LoginScreen from "./pages/LoginScreen"
 import RegisterScreen from "./pages/RegisterScreen";
 import LandingScreen from "./pages/LandingScreen";
 import TabNavigator from "./pages/TabNavigator";
-import { View } from "react-native";
 
 const Stack = createStackNavigator();
 

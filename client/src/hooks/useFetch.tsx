@@ -11,6 +11,7 @@ const useFetch = (req?: RequestInfo) => {
     const doFetch = () => {
         if (!req) return;
 
+        setData(null);
         setIsPending(true);
         setError(null);
         fetch(req)
@@ -36,9 +37,10 @@ const useFetch = (req?: RequestInfo) => {
         });
     }
 
+    const refresh = doFetch;
     useEffect(doFetch, [req]);
 
-    return {data, isPending, error, statusCode, doFetch};
+    return {data, isPending, error, statusCode, refresh};
 }
 
 export default useFetch;

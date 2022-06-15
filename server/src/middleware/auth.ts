@@ -15,7 +15,7 @@ const REFRESH_TOKEN_SECRET = process.env.REFRESH_TOKEN_SECRET;
 export const getAuthToken = (req: AuthorizationRequest, res: Response, next: NextFunction) => {
     const headers = req.headers;
     const authHeader = headers["authorization"];
-    console.log(authHeader);
+    //console.log(authHeader);
     if (!authHeader) return res.sendStatus(400);
 
     const token = authHeader.split(" ")[1];

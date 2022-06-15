@@ -170,6 +170,20 @@ export const registerUser = async (req: AuthenticationRequest, res: Response, ne
     }
 }
 
+export const logoutUser = async (req: AuthorizationRequest, res: Response) => {
+    if (!req.user) return res.sendStatus(500);
+
+    const updateUser = await prisma.user.update({
+        where: {
+            userId: req.user.userId,
+        },
+        data: {
+            token: null,
+        }
+    });
+    return res.sendStatus(200);
+}
+
 export const createWishlist = async (req: AuthorizationRequest, res: Response) => {
     const { title, description, content } = req.body;
     if (!title) return res.sendStatus(400);

@@ -3,7 +3,7 @@ import { FontAwesome, FontAwesome5, MaterialCommunityIcons } from "@expo/vector-
 import FeedTab from "./tabs/FeedTab";
 import FriendsTab from "./tabs/FriendsTab";
 import MyListsTab from "./tabs/MyListsTab";
-import ProfileTab from "./tabs/ProfileTab";
+import ProfileStackNavigator from "./tabs/Profile/ProfileStackNavigator";
 
 const Tab = createBottomTabNavigator();
 
@@ -22,7 +22,7 @@ const TabNavigator = () => {
       <Tab.Screen name="Feed" component={FeedTab}/>
       <Tab.Screen name="My lists" component={MyListsTab}/>
       <Tab.Screen name="Friends" component={FriendsTab}/>
-      <Tab.Screen name="Profile" component={ProfileTab}/>
+      <Tab.Screen name="Profile" component={ProfileStackNavigator}/>
     </Tab.Navigator>
   );
 };

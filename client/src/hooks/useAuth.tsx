@@ -8,6 +8,7 @@ const AuthContext = createContext({
     error: "",
     authToken: "",
     login: (username: string, password: string) => {},
+    logout: () => {},
     signup: (signUpData: SignUpData) => {},
     refreshAuthToken: () => {},
 });
@@ -30,6 +31,7 @@ const useProvideAuth = () => {
     const [isPending, setIsPending] = useState(false);
     
     const login = (username: string, password: string) => {
+        if (isPending) return;
         setIsPending(true);
         fetch("http://10.0.0.26:3001/api/login", {
             method: "POST",
@@ -59,7 +61,25 @@ const useProvideAuth = () => {
         });
     }
 
+    const logout = () => {
+        if (isPending) return;
+        setIsPending(true);
+        fetch("http://10.0.0.26:3001/api/logout", {
+            method: "POST",
+            mode: "cors",
+            headers: {
+                "Authorization": `JWT ${refreshToken}`
+            },
+        }).catch(e => {
+            setError(e.message);
+        }).finally(() => {
+            setLoggedIn(false);
+            setIsPending(false);
+        });
+    }
+
     const signup = (signUpData: SignUpData) => {
+        if (isPending) return;
         setIsPending(true);
         fetch("http://10.0.0.26:3001/api/login", {
             method: "POST",
@@ -87,6 +107,7 @@ const useProvideAuth = () => {
     }
 
     const refreshAuthToken = () => {
+        if (isPending) return;
         setIsPending(true);
         fetch("http://10.0.0.26:3001/api/refreshtoken", {
             method: "POST",
@@ -112,8 +133,8 @@ const useProvideAuth = () => {
     }
 
     useEffect(() => {
-        refreshAuthToken();
         if (refreshToken) {
+            refreshAuthToken();
             SecureStore.setItemAsync(refreshTokenSecureStoreKey, refreshToken);
         }
     }, [refreshToken]);
@@ -122,7 +143,7 @@ const useProvideAuth = () => {
         getValueFromKey(refreshTokenSecureStoreKey).then(setRefreshToken);
     }, []);
 
-    return {loggedIn, authToken, error, isPending, login, signup, refreshAuthToken}
+    return {loggedIn, authToken, error, isPending, login, logout, signup, refreshAuthToken}
 }
 
 const useAuth = () => {
