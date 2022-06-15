@@ -1,9 +1,13 @@
 import { Request, Response, NextFunction, json, urlencoded } from "express";
-import { PrismaClient, User, Friendship } from "@prisma/client";
+import { PrismaClient, User, Friendship, Wishlist } from "@prisma/client";
 import { AuthenticationRequest, AuthorizationRequest, SignedUserData } from "../config/types";
 
 const illegalUsernameFormat = /[!-\/:-@[-`{-~ ]/;
 const prisma = new PrismaClient();
+
+const stringifyComplexJSON = (data: any) => {
+    return JSON.stringify(data, (_key, value) => typeof value === 'bigint' ? value.toString() : value)
+}
 
 export const setUserRefreshToken = async (user: User, token: string) => {
     try {
@@ -57,7 +61,7 @@ export const retrieveUserLists = async (req: AuthorizationRequest, res: Response
                 ownerId: user.userId,
             }
         });
-        const formattedLists = JSON.stringify(lists, (_key, value) => typeof value === "bigint" ? value.toString() : value);
+        const formattedLists = stringifyComplexJSON(lists);
         return res.status(200).json(JSON.parse(formattedLists));
     } catch (e) {
         console.error(e);
@@ -93,7 +97,7 @@ export const getFriends = async (req: AuthorizationRequest, res: Response) => {
                 lastName: true,
             }
         });
-        const formattedLists = JSON.stringify(friends, (_key, value) => typeof value === "bigint" ? value.toString() : value);
+        const formattedLists = stringifyComplexJSON(friends);
         return res.status(200).json(JSON.parse(formattedLists));
     } catch (e) {
         console.error(e);
@@ -120,8 +124,9 @@ export const getOwnProfile = async (req: AuthorizationRequest, res: Response) =>
             }
         });
         if (!user) return res.status(500).send("An unknown error occurred while trying to find user info.");
-
-        return res.status(200).json(user);
+        const formattedUser = stringifyComplexJSON(user);
+        
+        return res.status(200).json(JSON.parse(formattedUser));
     } catch (e) {
         console.error(e);
         return res.sendStatus(500);
