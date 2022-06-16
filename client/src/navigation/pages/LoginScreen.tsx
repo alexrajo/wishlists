@@ -6,8 +6,10 @@ import {
   Heading,
   FormControl,
   VStack,
+  HStack,
   Input,
   Button,
+  Alert,
 } from "native-base";
 import { useEffect, useState } from "react";
 import { ImageBackground, StyleSheet } from "react-native";
@@ -41,8 +43,8 @@ const LoginScreen = (props: any) => {
   return (
     <View style={styles.container}>
       <Center style={styles.container} p={15}>
+      {!authIsPending && authError && !loggedIn && <ErrorAlert error={authError}/>}
         <Box alignItems={"center"}>
-          <Text>{authIsPending ? "Authenticating..." : authError}</Text>
           <Heading>LOG IN</Heading>
           <FormControl>
             <VStack>
@@ -77,6 +79,17 @@ const LoginScreen = (props: any) => {
     </View>
   );
 };
+
+const ErrorAlert = ({error}: {error: string}) => {
+  return (
+  <Alert status="error" style={{position: "absolute", bottom: 50}}>
+    <HStack space={2}>
+      <Alert.Icon mt={1}/>
+      <Text>{error}</Text>
+    </HStack>
+  </Alert>
+  );
+}
 
 const styles = StyleSheet.create({
   container: {

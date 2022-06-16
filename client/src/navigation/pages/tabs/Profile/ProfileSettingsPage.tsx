@@ -12,13 +12,17 @@ import {
 } from "native-base";
 import { useEffect } from "react";
 import useAuth from "../../../../hooks/useAuth";
+import useTopStackNavigator from "../../../../hooks/useTopStackNavigator";
 
 const ProfileSettingsPage = () => {
-  const { loggedIn, logout } = useAuth();
-  const onLogoutPressed = () => logout;
+  const { loggedIn, isPending, logout } = useAuth();
+  const onLogoutPressed = logout;
+
+  const topStackNavigation = useTopStackNavigator();
 
   useEffect(() => {
-    //Refer to the stack navigator at the top of the nest of navigators to navigate to the login page (useContext)
+    if (loggedIn) return;
+    topStackNavigation.navigate("Login");
   }, [loggedIn]);
 
   return (
@@ -73,7 +77,7 @@ const ProfileSettingsPage = () => {
             </FormControl.HelperText>
           </FormControl>
           <Spacer />
-          <Button bg={"red.500"} onPress={onLogoutPressed}>
+          <Button isLoading={isPending} bg={"red.500"} onPress={onLogoutPressed}>
             LOG OUT
           </Button>
           <Spacer />

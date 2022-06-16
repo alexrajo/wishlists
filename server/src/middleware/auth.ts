@@ -77,6 +77,21 @@ export const authorizeToken = (req: AuthorizationRequest, res: Response, next: N
     }
 }
 
+export const authorizeRefreshToken = (req: AuthorizationRequest, res: Response, next: NextFunction) => {
+    try {
+        const token = req.token;
+        jwt.verify(token, REFRESH_TOKEN_SECRET, (err: JsonWebTokenError, user: SignedUserData) => {
+            if (err) return res.status(401).send("Could not verify token!");
+            
+            req.user = user;
+            next();
+        });
+        return;
+    } catch (e) {
+        return res.status(500).send(e);
+    }
+}
+
 export const refreshToken = async (req: AuthorizationRequest, res: Response) => {
     try {
         const refreshToken = req.token;

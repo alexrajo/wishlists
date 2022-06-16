@@ -25,6 +25,10 @@ const RegisterScreen = (props: any) => {
     props.navigation.navigate("Login");
   };
 
+  const onRegisterPressed = () => {
+
+  }
+
   useEffect(() => {
     setCanProceed(firstName && lastName && username && password ? true : false);
   }, [firstName, lastName, username, password]);
@@ -88,7 +92,7 @@ const RegisterScreen = (props: any) => {
               </FormControl.HelperText>
             </VStack>
           </FormControl>
-          <Button isDisabled={!canProceed}>CREATE ACCOUNT</Button>
+          <Button isDisabled={!canProceed} onPress={onRegisterPressed}>CREATE ACCOUNT</Button>
           <Box>
             <Text fontSize={"lg"}>Already have an account?</Text>
             <Button onPress={onGoToLoginScreenPressed}>LOG IN</Button>

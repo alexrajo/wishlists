@@ -185,7 +185,7 @@ export const logoutUser = async (req: AuthorizationRequest, res: Response) => {
 }
 
 export const createWishlist = async (req: AuthorizationRequest, res: Response) => {
-    const { title, description, content } = req.body;
+    const { title, description } = req.body;
     if (!title) return res.sendStatus(400);
 
     const user = req.user;

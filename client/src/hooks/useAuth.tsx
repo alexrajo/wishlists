@@ -30,8 +30,9 @@ const useProvideAuth = () => {
     const [error, setError] = useState("");
     const [isPending, setIsPending] = useState(false);
     
-    const login = (username: string, password: string) => {
+    const login = (usernameOrEmail: string, password: string) => {
         if (isPending) return;
+        setError("");
         setIsPending(true);
         fetch("http://10.0.0.26:3001/api/login", {
             method: "POST",
@@ -41,7 +42,8 @@ const useProvideAuth = () => {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
-                username: username,
+                username: usernameOrEmail,
+                email: usernameOrEmail,
                 password: password,
             }),
         }).then(res => {
@@ -70,10 +72,17 @@ const useProvideAuth = () => {
             headers: {
                 "Authorization": `JWT ${refreshToken}`
             },
+        }).then((res: Response) => {
+            if (!res.ok) throw new Error(`Could not log out! Status: ${res.status}`);
+            SecureStore.deleteItemAsync(refreshTokenSecureStoreKey)
+            .then(() => setLoggedIn(false))
+            .catch(e => {
+                console.error(e);
+            });
         }).catch(e => {
+            console.error(e);
             setError(e.message);
         }).finally(() => {
-            setLoggedIn(false);
             setIsPending(false);
         });
     }

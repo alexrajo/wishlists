@@ -11,12 +11,13 @@ import {
 import { MaterialCommunityIcons, FontAwesome5 } from "@expo/vector-icons";
 import { Pressable, StyleSheet } from "react-native";
 import useAuth from "../../../../hooks/useAuth";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import useFetch from "../../../../hooks/useFetch";
 
 const ProfileTab = ({navigation}: any) => {
   const { loggedIn, authToken } = useAuth();
-  const [request, setRequest] = useState(
+
+  const createNewRequest = () => (
     new Request("http://10.0.0.26:3001/api/myprofile", {
       method: "GET",
       mode: "cors",
@@ -25,16 +26,21 @@ const ProfileTab = ({navigation}: any) => {
       },
     })
   );
-  const { data: profileData, error: fetchError, isPending } = useFetch(request);
+  const [request, setRequest] = useState(createNewRequest());
+  const { data: profileData, error: fetchError, isPending, refresh } = useFetch(request);
 
   const onSettingsButtonPressed = () => {
     navigation.navigate("Settings");
   };
 
+  useEffect(() => {
+    setRequest(createNewRequest());
+  }, [authToken]);
+
   return (
     <View flex={1}>
       <Center flex={1}>
-        {fetchError && <Text color={"red.500"}>{fetchError}</Text>}
+        {fetchError && <><Text color={"red.500"}>{fetchError}</Text><Button onPress={refresh}>Try again</Button></>}
         {profileData && (
           <Box rounded="md" style={styles.userInfoContainer}>
             <Pressable
