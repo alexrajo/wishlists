@@ -4,13 +4,14 @@ import { GestureResponderEvent, ListRenderItemInfo, RefreshControl, StyleSheet }
 import ListButton from "./ListButton";
 import useAuth from "../hooks/useAuth";
 import useFetch from "../hooks/useFetch";
+import { HOST } from "../config/variables";
 
 const RefreshableList = ({children, endpoint, placeholder, onPress}: {children?: React.ReactNode, endpoint: string, placeholder?: React.ReactNode, onPress?: ((event?: GestureResponderEvent) => void) | null | undefined}) => {
     const {authToken} = useAuth();
 
     const newRequestObject = () => {
         return new Request(
-            "http://10.0.0.26:3001" + endpoint,
+            HOST + endpoint,
             {
                 method: "GET",
                 mode: "cors",

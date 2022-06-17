@@ -1,8 +1,20 @@
-import { useEffect, useState, useContext, createContext, Component } from "react"
+import { useEffect, useState, useContext, createContext, Component, Context } from "react"
 import * as SecureStore from 'expo-secure-store';
+import { HOST } from "../config/variables";
+
+interface AuthContextInterface {
+    loggedIn: boolean;
+    isPending: boolean;
+    error?: string;
+    authToken?: string;
+    login: (username: string, password: string) => void;
+    logout: () => void;
+    signup: (signUpData: SignUpData) => void;
+    refreshAuthToken: () => void;
+};
 
 const refreshTokenSecureStoreKey = "refreshToken";
-const AuthContext = createContext({
+const AuthContext = createContext<AuthContextInterface>({
     loggedIn: false,
     isPending: true,
     error: "",
@@ -27,14 +39,14 @@ const useProvideAuth = () => {
     const [loggedIn, setLoggedIn] = useState(false);
     const [authToken, setAuthToken] = useState("");
     const [refreshToken, setRefreshToken] = useState<string | null>();
-    const [error, setError] = useState("");
+    const [error, setError] = useState<string | undefined>();
     const [isPending, setIsPending] = useState(false);
     
     const login = (usernameOrEmail: string, password: string) => {
         if (isPending) return;
-        setError("");
+        setError(undefined);
         setIsPending(true);
-        fetch("http://10.0.0.26:3001/api/login", {
+        fetch(`${HOST}/api/login`, {
             method: "POST",
             mode: "cors",
             headers: {
@@ -65,8 +77,9 @@ const useProvideAuth = () => {
 
     const logout = () => {
         if (isPending) return;
+        setError(undefined);
         setIsPending(true);
-        fetch("http://10.0.0.26:3001/api/logout", {
+        fetch(`${HOST}/api/logout`, {
             method: "POST",
             mode: "cors",
             headers: {
@@ -89,11 +102,13 @@ const useProvideAuth = () => {
 
     const signup = (signUpData: SignUpData) => {
         if (isPending) return;
+        setError(undefined);
         setIsPending(true);
-        fetch("http://10.0.0.26:3001/api/login", {
+        fetch(`${HOST}/api/register`, {
             method: "POST",
             mode: "cors",
             headers: {
+                "Accept": "*/*",
                 "Content-Type": "application/json",
             },
             body: JSON.stringify(signUpData),
@@ -117,8 +132,9 @@ const useProvideAuth = () => {
 
     const refreshAuthToken = () => {
         if (isPending) return;
+        setError(undefined);
         setIsPending(true);
-        fetch("http://10.0.0.26:3001/api/refreshtoken", {
+        fetch(`${HOST}/api/refreshtoken`, {
             method: "POST",
             mode: "cors",
             headers: {

@@ -1,12 +1,21 @@
 import { Request, Response, NextFunction, json, urlencoded } from "express";
 import { PrismaClient, User, Friendship, Wishlist } from "@prisma/client";
 import { AuthenticationRequest, AuthorizationRequest, SignedUserData } from "../config/types";
+import { hashPassword } from "./auth";
 
-const illegalUsernameFormat = /[!-\/:-@[-`{-~ ]/;
+const bcrypt = require("bcrypt");
+
+const illegalUsernameFormat = /[!-\/:-@[-`{-~ *+]/;
 const prisma = new PrismaClient();
 
 const stringifyComplexJSON = (data: any) => {
     return JSON.stringify(data, (_key, value) => typeof value === 'bigint' ? value.toString() : value)
+}
+
+const isValidEmail = (email: string) => {
+    const atMatches = email.match("@");
+    if (atMatches == null || atMatches.length > 1) return false;
+    return true;
 }
 
 export const setUserRefreshToken = async (user: User, token: string) => {
@@ -135,21 +144,25 @@ export const getOwnProfile = async (req: AuthorizationRequest, res: Response) =>
 
 export const registerUser = async (req: AuthenticationRequest, res: Response, next: NextFunction) => {
     try {
-        const {username, password, firstName, lastName, dateOfBirth, email} = req.body;
-        if (!(username && password && firstName && lastName && dateOfBirth)) return res.status(400).send("Missing input!");
-        if(illegalUsernameFormat.test(username)) return res.status(400).send("Invalid username!");
+        console.log(req.body);
+        const {username, password, firstName, lastName, dateOfBirth, email}: {username: string, password: string, firstName: string, lastName: string, dateOfBirth: string, email?: string} = req.body;
+        if (!(username && password && firstName && lastName && dateOfBirth) || (username && username.length < 1)) return res.status(400).send("Missing input!");
+        if (illegalUsernameFormat.test(username)) return res.status(400).send("Invalid username!");
+        if (email !== undefined && email.length >= 3 && !isValidEmail(email)) return res.status(400).send("Invalid email!");
         if (password.length < 8) {
             return res.status(400).send("Invalid password! Password cannot be shorter than 8 characters.");
         }
 
+        const hashedPassword: string = await hashPassword(password);
+
         const newUser = await prisma.user.create({
             data: {
                 username: username,
-                password: password,
+                password: hashedPassword,
                 firstName: firstName,
                 lastName: lastName,
                 dateOfBirth: new Date(dateOfBirth),
-                email: email,
+                email: email !== undefined && email.length >= 3 ? email.toLowerCase() : undefined,
             }
         });
 

@@ -25,6 +25,8 @@ export const getAuthToken = (req: AuthorizationRequest, res: Response, next: Nex
     next();
 }
 
+export const hashPassword = async (plainTextPassword: string) => bcrypt.hash(plainTextPassword, saltRounds);
+
 const userDataToSignableUserData = (user: User): SignedUserData => {
     return {
         userId: user.userId,

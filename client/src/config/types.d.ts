@@ -1,10 +1,10 @@
 interface SignUpData {
-    firstName: string,
-    lastName: string,
-    username: string,
+    firstName: string | undefined,
+    lastName: string | undefined,
+    username: string | undefined,
     email?: string,
-    password: string,
-    dateOfBirth: string,
+    password: string | undefined,
+    dateOfBirth: string | undefined,
 }
 
 interface Wishlist {

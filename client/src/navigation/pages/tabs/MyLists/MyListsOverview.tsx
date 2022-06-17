@@ -10,9 +10,10 @@ const MyListsOverview = ({navigation}: any) => {
     }
 
     return (
-        <RefreshableList onPress={onListElementPressed} endpoint="/api/mylists" placeholder={<Text>Looks like you haven't made any wishlists yet. Create one now!</Text>}>
+        <>
+            <RefreshableList onPress={onListElementPressed} endpoint="/api/mylists" placeholder={<Text>Looks like you haven't made any wishlists yet. Create one now!</Text>}/>
             <Fab bg="white" onPress={() => navigation.navigate("Create")} renderInPortal={false} shadow={2} size="md" icon={<Icon color="black" as={Ionicons} name="add" size="md"/>}/>
-        </RefreshableList>
+        </>
     );
 }
 

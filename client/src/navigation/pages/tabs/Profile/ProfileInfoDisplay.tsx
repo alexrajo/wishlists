@@ -13,12 +13,13 @@ import { Pressable, StyleSheet } from "react-native";
 import useAuth from "../../../../hooks/useAuth";
 import { useEffect, useState } from "react";
 import useFetch from "../../../../hooks/useFetch";
+import { HOST } from "../../../../config/variables";
 
 const ProfileTab = ({navigation}: any) => {
   const { loggedIn, authToken } = useAuth();
 
   const createNewRequest = () => (
-    new Request("http://10.0.0.26:3001/api/myprofile", {
+    new Request(`${HOST}/api/myprofile`, {
       method: "GET",
       mode: "cors",
       headers: {
@@ -54,7 +55,7 @@ const ProfileTab = ({navigation}: any) => {
                 {DefaultAvatarIcon()}
               </Avatar>
               <Box alignItems={"center"}>
-                <Heading>
+                <Heading textAlign="center">
                   {profileData.firstName + " " + profileData.lastName}
                 </Heading>
                 <Text fontStyle={"italic"}>@{profileData.username}</Text>

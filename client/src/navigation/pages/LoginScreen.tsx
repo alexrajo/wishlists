@@ -14,6 +14,7 @@ import {
 import { useEffect, useState } from "react";
 import { ImageBackground, StyleSheet } from "react-native";
 import useAuth from "../../hooks/useAuth";
+import ErrorAlert from "../../components/ErrorAlert";
 
 const LoginScreen = (props: any) => {
   const [usernameOrEmail, setUsernameOrEmail] = useState<string>("");
@@ -79,17 +80,6 @@ const LoginScreen = (props: any) => {
     </View>
   );
 };
-
-const ErrorAlert = ({error}: {error: string}) => {
-  return (
-  <Alert status="error" style={{position: "absolute", bottom: 50}}>
-    <HStack space={2}>
-      <Alert.Icon mt={1}/>
-      <Text>{error}</Text>
-    </HStack>
-  </Alert>
-  );
-}
 
 const styles = StyleSheet.create({
   container: {
