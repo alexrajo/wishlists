@@ -1,4 +1,5 @@
 import {
+  AlertDialog,
   Button,
   FormControl,
   Heading,
@@ -10,15 +11,22 @@ import {
   View,
   VStack,
 } from "native-base";
-import { useEffect } from "react";
+import { useEffect, useState, useRef } from "react";
 import useAuth from "../../../../hooks/useAuth";
 import useTopStackNavigator from "../../../../hooks/useTopStackNavigator";
 
 const ProfileSettingsPage = () => {
   const { loggedIn, isPending, logout } = useAuth();
-  const onLogoutPressed = logout;
+
+  const [isLogoutAlertOpen, setIsLogoutAlertOpen] = useState(false);
+  const cancelRef = useRef(null);
 
   const topStackNavigation = useTopStackNavigator();
+
+  const onLogoutConfirmed = () => {
+    setIsLogoutAlertOpen(false);
+    logout();
+  };
 
   useEffect(() => {
     if (loggedIn) return;
@@ -77,7 +85,22 @@ const ProfileSettingsPage = () => {
             </FormControl.HelperText>
           </FormControl>
           <Spacer />
-          <Button isLoading={isPending} bg={"red.500"} onPress={onLogoutPressed}>
+          <AlertDialog leastDestructiveRef={cancelRef} onClose={() => setIsLogoutAlertOpen(false)} isOpen={isLogoutAlertOpen}>
+            <AlertDialog.Content>
+              <AlertDialog.Header>
+                <Text fontWeight="semibold">Log out of account</Text>
+                <AlertDialog.CloseButton/>
+              </AlertDialog.Header>
+              <AlertDialog.Body>
+                <Text>Are you sure you want to log out? You will need to re-enter your login information to log back in.</Text>
+              </AlertDialog.Body>
+              <AlertDialog.Footer>
+                <Button variant="ghost" onPress={() => setIsLogoutAlertOpen(false)} ref={cancelRef}>Cancel</Button>
+                <Button onPress={onLogoutConfirmed} bg="red.500">Log out</Button>
+              </AlertDialog.Footer>
+            </AlertDialog.Content>
+          </AlertDialog>
+          <Button isLoading={isPending} bg={"red.500"} onPress={() => setIsLogoutAlertOpen(true)}>
             LOG OUT
           </Button>
           <Spacer />
