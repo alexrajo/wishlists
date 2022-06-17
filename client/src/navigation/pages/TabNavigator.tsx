@@ -1,7 +1,7 @@
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { FontAwesome, FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
 import FeedTab from "./tabs/FeedTab";
-import FriendsTab from "./tabs/FriendsTab";
+import FriendsStackNavigator from "./tabs/Friends/FriendsStackNavigator";
 import MyListsStackNavigator from "./tabs/MyLists/MyListsStackNavigator";
 import ProfileStackNavigator from "./tabs/Profile/ProfileStackNavigator";
 
@@ -21,7 +21,7 @@ const TabNavigator = () => {
       })}>
       <Tab.Screen name="Feed" component={FeedTab}/>
       <Tab.Screen name="My lists" component={MyListsStackNavigator}/>
-      <Tab.Screen name="Friends" component={FriendsTab}/>
+      <Tab.Screen name="Friends" component={FriendsStackNavigator}/>
       <Tab.Screen name="Profile" component={ProfileStackNavigator}/>
     </Tab.Navigator>
   );

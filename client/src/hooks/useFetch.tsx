@@ -9,7 +9,7 @@ const useFetch = (req?: RequestInfo) => {
     const [statusCode, setStatusCode] = useState<number>();
 
     const doFetch = () => {
-        if (!req) return;
+        if (req === undefined) return;
 
         setData(null);
         setIsPending(true);

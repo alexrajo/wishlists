@@ -13,6 +13,14 @@ interface Wishlist {
     description?: string,
 }
 
+interface User {
+    userId: number,
+    username: string,
+    firstName: string,
+    lastName: string,
+    email?: string,
+}
+
 interface AuthResponse {
     authToken?: string,
     refreshToken?: string,

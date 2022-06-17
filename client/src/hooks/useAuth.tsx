@@ -27,7 +27,7 @@ const AuthContext = createContext<AuthContextInterface>({
 
 const getValueFromKey = async (key: string) => {
     const result = await SecureStore.getItemAsync(key);
-    return result;
+    return result || undefined;
 }
 
 export const ProvideAuth = ({children}: any) => {
@@ -37,8 +37,8 @@ export const ProvideAuth = ({children}: any) => {
 
 const useProvideAuth = () => {
     const [loggedIn, setLoggedIn] = useState(false);
-    const [authToken, setAuthToken] = useState("");
-    const [refreshToken, setRefreshToken] = useState<string | null>();
+    const [authToken, setAuthToken] = useState<string | undefined>();
+    const [refreshToken, setRefreshToken] = useState<string | undefined>();
     const [error, setError] = useState<string | undefined>();
     const [isPending, setIsPending] = useState(false);
     
@@ -65,6 +65,7 @@ const useProvideAuth = () => {
             throw new Error("Could not authenticate!");
         }).then((data: AuthResponse) => {
             setRefreshToken(data.refreshToken);
+            setAuthToken(data.authToken);
             setLoggedIn(true);
         })
         .catch(e => {

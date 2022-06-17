@@ -2,11 +2,15 @@ import { View, Box, HStack, Text, Divider, Fab, Icon } from "native-base";
 import { useEffect, useState } from "react";
 import { Pressable } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
-import RefreshableList from "../../../components/RefreshableList";
+import RefreshableList from "../../../../components/RefreshableList";
 
-const FriendsTab = () => {
+const FriendsOverview = ({navigation}: any) => {
     const [selectedSection, setSelectedSection] = useState(0);
     const [endpoint, setEndpoint] = useState("/api/friends");
+
+    const onAddFriendPressed = () => {
+        navigation.navigate("AddFriend");
+    }
 
     useEffect(() => {
         switch (selectedSection) {
@@ -43,9 +47,9 @@ const FriendsTab = () => {
                 </HStack>
             </Box>
             <RefreshableList endpoint={endpoint} placeholder={<Text>This page is empty, send a friend request to someone!</Text>}/>
-            <Fab bg="white" renderInPortal={false} shadow={2} size="md" icon={<Icon color="black" as={AntDesign} name="adduser" size="md"/>}/>
+            <Fab onPress={onAddFriendPressed} bg="white" renderInPortal={false} shadow={2} size="md" icon={<Icon color="black" as={AntDesign} name="adduser" size="md"/>}/>
         </View>
     );
 }
 
-export default FriendsTab;
+export default FriendsOverview;

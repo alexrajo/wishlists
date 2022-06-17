@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction, Application } from "express";
 import {authorizeToken, authenticateUser, refreshToken, getAuthToken, authorizeRefreshToken} from "../middleware/auth";
-import {retrieveUserLists, getUserFromLoginInformation, registerUser, createWishlist, getFriends, getOwnProfile, logoutUser} from "../middleware/dbManager";
+import {retrieveUserLists, getUserFromLoginInformation, registerUser, createWishlist, getFriends, getOwnProfile, logoutUser, searchForUsersByUsername} from "../middleware/dbManager";
 
 export default (app: Application) => {
 
@@ -19,6 +19,7 @@ export default (app: Application) => {
     app.post("/api/init", getAuthToken, authorizeToken, (req: Request, res: Response) => {
         return res.sendStatus(200);
     });
+    app.post("/api/searchusers", searchForUsersByUsername);
 
     app.get("/api/mylists", getAuthToken, authorizeToken, retrieveUserLists);
     app.get("/api/friends", getAuthToken, authorizeToken, getFriends);

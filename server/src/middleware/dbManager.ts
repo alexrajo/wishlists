@@ -12,9 +12,11 @@ const stringifyComplexJSON = (data: any) => {
     return JSON.stringify(data, (_key, value) => typeof value === 'bigint' ? value.toString() : value)
 }
 
-const isValidEmail = (email: string) => {
+const isValidEmail = (email: string | undefined) => {
+    if (email === undefined) return false;
     const atMatches = email.match("@");
     if (atMatches == null || atMatches.length > 1) return false;
+    if (email.length < 3) return false;
     return true;
 }
 
@@ -50,7 +52,7 @@ export const getUserFromLoginInformation = async (req: AuthenticationRequest, re
             where: {
                 OR : [
                     { username: username },
-                    { email: email },
+                    { email: isValidEmail(email) ? email.toLowerCase() : undefined },
                 ]
             }
         })
@@ -148,7 +150,7 @@ export const registerUser = async (req: AuthenticationRequest, res: Response, ne
         const {username, password, firstName, lastName, dateOfBirth, email}: {username: string, password: string, firstName: string, lastName: string, dateOfBirth: string, email?: string} = req.body;
         if (!(username && password && firstName && lastName && dateOfBirth) || (username && username.length < 1)) return res.status(400).send("Missing input!");
         if (illegalUsernameFormat.test(username)) return res.status(400).send("Invalid username!");
-        if (email !== undefined && email.length >= 3 && !isValidEmail(email)) return res.status(400).send("Invalid email!");
+        if (email !== undefined && email !== "" && !isValidEmail(email)) return res.status(400).send("Invalid email!");
         if (password.length < 8) {
             return res.status(400).send("Invalid password! Password cannot be shorter than 8 characters.");
         }
@@ -162,7 +164,7 @@ export const registerUser = async (req: AuthenticationRequest, res: Response, ne
                 firstName: firstName,
                 lastName: lastName,
                 dateOfBirth: new Date(dateOfBirth),
-                email: email !== undefined && email.length >= 3 ? email.toLowerCase() : undefined,
+                email: isValidEmail(email) ? email!.toLowerCase() : undefined,
             }
         });
 
@@ -213,4 +215,29 @@ export const createWishlist = async (req: AuthorizationRequest, res: Response) =
     });
     if (!newWishlist) return res.sendStatus(500);
     return res.status(200).send("Wishlist created!");
+}
+
+export const searchForUsersByUsername = async (req: Request, res: Response) => {
+    try {
+        const {username} = req.body;
+        if (!username) return res.status(400).send("Missing input!");
+
+        const users = await prisma.user.findMany({
+            where: {
+                username: {
+                    search: username,
+                }
+            },
+            take: 5,
+            select: {
+                userId: true,
+                username: true,
+                firstName: true,
+                lastName: true,
+            }
+        });
+        return res.status(200).json(users);
+    } catch {
+        return res.sendStatus(500);
+    }
 }
