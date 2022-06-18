@@ -70,6 +70,9 @@ export const retrieveUserLists = async (req: AuthorizationRequest, res: Response
         const lists = await prisma.wishlist.findMany({
             where: {
                 ownerId: user.userId,
+            },
+            include: {
+                items: true,
             }
         });
         const formattedLists = stringifyComplexJSON(lists);
@@ -200,21 +203,29 @@ export const logoutUser = async (req: AuthorizationRequest, res: Response) => {
 }
 
 export const createWishlist = async (req: AuthorizationRequest, res: Response) => {
-    const { title, description } = req.body;
-    if (!title) return res.sendStatus(400);
+    const { title, description, items } = req.body;
+    if (!title || !items) return res.sendStatus(400);
 
     const user = req.user;
     if(!user) return res.sendStatus(500);
 
-    const newWishlist = await prisma.wishlist.create({
-        data: {
-            ownerId: user.userId,
-            title: title,
-            description: description,
-        }
-    });
-    if (!newWishlist) return res.sendStatus(500);
-    return res.status(200).send("Wishlist created!");
+    try {
+        const newWishlist = await prisma.wishlist.create({
+            data: {
+                ownerId: user.userId,
+                title: title,
+                description: description,
+                items: {
+                    create: items,
+                },
+            }
+        });
+        if (!newWishlist) return res.sendStatus(500);
+        return res.status(200).send("Wishlist created!");
+    } catch (e) {
+        console.error(e);
+        return res.sendStatus(500);
+    }
 }
 
 export const searchForUsersByUsername = async (req: Request, res: Response) => {

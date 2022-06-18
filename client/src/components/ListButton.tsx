@@ -2,7 +2,7 @@ import { Pressable, View, Box, Text, ChevronRightIcon } from "native-base";
 import { useState } from "react";
 import { GestureResponderEvent, StyleSheet } from "react-native";
 
-const ListButton = ({children, onPress}: {children: any, onPress?: ((event?: GestureResponderEvent) => void) | null | undefined}) => {
+const ListButton = ({children, onPress}: {children: any, onPress?: (() => void) | null | undefined}) => {
 
     const [isPressed, setIsPressed] = useState(false);
 

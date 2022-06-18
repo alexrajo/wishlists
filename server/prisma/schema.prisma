@@ -30,7 +30,7 @@ model User {
   token                  String?      @db.VarChar(256)
   friendshipsAsInitiator Friendship[] @relation("friendships_user1_idTousers")
   friendshipsAsReceiver  Friendship[] @relation("friendships_user2_idTousers")
-  items                  items[]      @relation("itemsTousers")
+  items                  Item[]      @relation("itemsTousers")
   userRoles              UserRole[]   @relation("user_rolesTousers")
 
   @@map("users")
@@ -41,7 +41,7 @@ model Wishlist {
   ownerId     Int     @map("owner_id")
   title       String  @db.VarChar(25)
   description String? @db.VarChar(128)
-  items       items[] @relation("itemsTowishlists")
+  items       Item[] @relation("itemsTowishlists")
 
   @@map("wishlists")
 }
@@ -64,11 +64,12 @@ model UserRole {
   @@map("user_roles")
 }
 
-model items {
-  item_id            BigInt   @id @default(autoincrement())
-  wishlist_id        BigInt
+model Item {
+  itemId             BigInt   @id @default(autoincrement()) @map("item_id")
+  wishlistId         BigInt @map("wishlist_id")
   name               String   @db.VarChar(32)
-  claimed_by_user_id Int?
-  users              User?    @relation("itemsTousers", fields: [claimed_by_user_id], references: [userId], onDelete: NoAction, onUpdate: NoAction, map: "fk_claimed_by_user")
-  wishlists          Wishlist @relation("itemsTowishlists", fields: [wishlist_id], references: [wishlistId], onDelete: NoAction, onUpdate: NoAction, map: "fk_wishlist")
+  claimedByUserId    Int? @map("claimed_by_user_id")
+  users              User?    @relation("itemsTousers", fields: [claimedByUserId], references: [userId], onDelete: NoAction, onUpdate: NoAction, map: "fk_claimed_by_user")
+  wishlists          Wishlist @relation("itemsTowishlists", fields: [wishlistId], references: [wishlistId], onDelete: NoAction, onUpdate: NoAction, map: "fk_wishlist")
+  @@map("items")
 }

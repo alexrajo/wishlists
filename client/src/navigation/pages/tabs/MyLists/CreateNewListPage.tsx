@@ -26,7 +26,7 @@ const CreateNewListPage = ({navigation}: any) => {
             body: JSON.stringify({
                 title: title,
                 description: description,
-                items: items,
+                items: items.map((name: string) => {return {name: name};}),
             })
         }).then((res: Response) => {
             if (res.status === 401) refreshAuthToken();

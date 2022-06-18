@@ -6,7 +6,7 @@ import useAuth from "../hooks/useAuth";
 import useFetch from "../hooks/useFetch";
 import { HOST } from "../config/variables";
 
-const RefreshableList = ({children, endpoint, placeholder, onPress}: {children?: React.ReactNode, endpoint: string, placeholder?: React.ReactNode, onPress?: ((event?: GestureResponderEvent) => void) | null | undefined}) => {
+const RefreshableList = ({children, endpoint, placeholder, onPress}: {children?: React.ReactNode, endpoint: string, placeholder?: React.ReactNode, onPress?: ((data: any) => void) | null | undefined}) => {
     const {authToken} = useAuth();
 
     const newRequestObject = () => {
@@ -56,8 +56,11 @@ const RefreshableList = ({children, endpoint, placeholder, onPress}: {children?:
     );
 }
 
-const renderListPreview = (itemData: ListRenderItemInfo<Wishlist>, onPress?: ((event?: GestureResponderEvent) => void) | null | undefined) => (
-    <ListButton onPress={onPress}>
+const renderListPreview = (itemData: ListRenderItemInfo<Wishlist>, onPress?: ((data: any) => void) | null | undefined) => (
+    <ListButton onPress={() => {
+        if (!onPress) return;
+        onPress(itemData.item)
+    }}>
         <Text fontSize={"md"} fontWeight={"semibold"}>{itemData.item.title}</Text>
         <Text>{itemData.item.description}</Text>
     </ListButton>

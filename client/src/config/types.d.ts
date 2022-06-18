@@ -7,10 +7,17 @@ interface SignUpData {
     dateOfBirth: string | undefined,
 }
 
+interface Item {
+    itemId: number,
+    name: string,
+    claimedById?: number,
+}
+
 interface Wishlist {
     wishlistId: number,
     title: string,
     description?: string,
+    items: Array<Item>,
 }
 
 interface User {
