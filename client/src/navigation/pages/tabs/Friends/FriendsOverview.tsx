@@ -18,10 +18,10 @@ const FriendsOverview = ({navigation}: any) => {
                 setEndpoint("/api/friends");
                 break;
             case (1):
-                setEndpoint("/api/friendrequests");
+                setEndpoint("/api/incomingfriendships");
                 break;
             case (2):
-                setEndpoint("/api/outgoingfriendrequests");
+                setEndpoint("/api/outgoingfriendships");
                 break;
             default:
                 setEndpoint("/api/friends");
@@ -46,7 +46,22 @@ const FriendsOverview = ({navigation}: any) => {
                     </Pressable></Box>
                 </HStack>
             </Box>
-            <RefreshableList endpoint={endpoint} placeholder={<Text>This page is empty, send a friend request to someone!</Text>}/>
+            <RefreshableList 
+                endpoint={endpoint} 
+                placeholder={<Text>This page is empty, send a friend request to someone!</Text>}
+                keyExtractor={(item: Friendship) => item.friendshipId.toString()}
+                itemDataToContent={
+                    (itemData) => {
+                        const friendship: Friendship = itemData.item;
+                        const user = friendship.receiver || friendship.initiator;
+
+                        return <>{user && <>
+                            <Text>{`${user.firstName} ${user.lastName}`}</Text>
+                            <Text>@{user.username}</Text>
+                        </>}</>
+                    }
+                }
+            />
             <Fab onPress={onAddFriendPressed} bg="white" renderInPortal={false} shadow={2} size="md" icon={<Icon color="black" as={AntDesign} name="adduser" size="md"/>}/>
         </View>
     );

@@ -4,7 +4,7 @@ import useAuth from "./useAuth";
 const useFetch = (req?: RequestInfo) => {
     const {refreshAuthToken} = useAuth();
     const [isPending, setIsPending] = useState(false);
-    const [error, setError] = useState<String|null>(null);
+    const [error, setError] = useState<string|null>(null);
     const [data, setData] = useState<any>(null); //Change type from any
     const [statusCode, setStatusCode] = useState<number>();
 
@@ -21,7 +21,7 @@ const useFetch = (req?: RequestInfo) => {
                 if (res.status == 401) {
                     refreshAuthToken();
                 }
-                throw Error("Could not load data. " + res.statusText);
+                throw Error("Could not complete request.");
             }
             return res;
         })

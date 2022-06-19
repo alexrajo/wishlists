@@ -1,17 +1,58 @@
-import { Center, Heading, View, Text, FlatList, Box, CircleIcon, HStack, Button, Pressable, MinusIcon } from "native-base";
+import { Center, Heading, View, Text, FlatList, Box, CircleIcon, HStack, Button, Pressable, AlertDialog, Spinner } from "native-base";
 import { ListRenderItemInfo, StyleSheet } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
+import { useEffect, useRef, useState } from "react";
+import { HOST } from "../../config/variables";
+import useFetch from "../../hooks/useFetch";
+import useAuth from "../../hooks/useAuth";
 
-const ListViewingPage = ({route, goBack}: {route: {params: {wishlist: Wishlist}}, goBack?: () => void}) => {
+const ListViewingPage = ({route, navigation}: {route: {params: {wishlist: Wishlist}}, navigation: any}) => {
     const {wishlist} = route.params;
     const items = wishlist.items;
     const isOwnWishlist = true;
+
+    const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
+    const [deleteRequest, setDeleteRequest] = useState<RequestInfo>();
+    const {data: deleteResponseData, isPending: isDeleting, error: deletionError, statusCode: deletionStatusCode} = useFetch(deleteRequest);
+
+    const {authToken, loggedIn} = useAuth();
+    const cancelRef = useRef(null);
+
+    const onDeleteConfirmed = () => {
+        if (!isOwnWishlist) return;
+
+        setDeleteRequest(
+            new Request(`${HOST}/api/deletewishlist`,
+                {
+                    method: "POST",
+                    mode: "cors",
+                    headers: {
+                        "Accept": "*/*",
+                        "Content-Type": "application/json",
+                        "Authorization": `JWT ${authToken}`,
+                    },
+                    body: JSON.stringify({
+                        wishlistId: wishlist.wishlistId,
+                    }),
+                }
+            )
+        );
+        
+        setIsDeleteAlertOpen(false);
+    }
+
+    useEffect(() => {
+        if (!isDeleting && deletionStatusCode === 200) {
+            navigation.goBack();
+        }
+    }, [isDeleting]);
     
     return (
         <View flex={1}>
             <Center flex={1} paddingTop={5}>
                 <Heading>{wishlist.title}</Heading>
                 <Text>{wishlist.description}</Text>
+                {deletionError && <Text>Error ({deletionStatusCode}): {deletionError}</Text>}
                 <FlatList 
                     marginTop={5}
                     style={styles.list} 
@@ -20,9 +61,25 @@ const ListViewingPage = ({route, goBack}: {route: {params: {wishlist: Wishlist}}
                     keyExtractor={item => item.itemId.toString()}
                 />
             </Center>
-            <Pressable position="absolute" right={5} top={5}>
+            <Pressable position="absolute" right={5} top={5} onPress={() => setIsDeleteAlertOpen(true)}>
                 <MaterialIcons name="delete-forever" color="red" size={32}/>
             </Pressable>
+
+            <AlertDialog leastDestructiveRef={cancelRef} onClose={() => setIsDeleteAlertOpen(false)} isOpen={isDeleteAlertOpen}>
+            <AlertDialog.Content>
+              <AlertDialog.Header>
+                <Text fontWeight="semibold">Delete wishlist</Text>
+                <AlertDialog.CloseButton/>
+              </AlertDialog.Header>
+              <AlertDialog.Body>
+                <Text>Are you sure you want to PERMANENTLY delete this wishlist?</Text>
+              </AlertDialog.Body>
+              <AlertDialog.Footer>
+                <Button variant="ghost" onPress={() => setIsDeleteAlertOpen(false)} ref={cancelRef}>Cancel</Button>
+                <Button onPress={onDeleteConfirmed} bg="red.500">Delete</Button>
+              </AlertDialog.Footer>
+            </AlertDialog.Content>
+          </AlertDialog>
         </View>
     );
 }

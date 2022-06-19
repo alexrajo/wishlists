@@ -31,7 +31,8 @@ CREATE TABLE items (
     PRIMARY KEY(item_id),
     CONSTRAINT fk_wishlist
         FOREIGN KEY(wishlist_id)
-            REFERENCES wishlists(wishlist_id),
+            REFERENCES wishlists(wishlist_id)
+            ON DELETE CASCADE,
 
     CONSTRAINT fk_claimed_by_user
         FOREIGN KEY(claimed_by_user_id)

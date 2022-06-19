@@ -1,8 +1,10 @@
-import { View, Heading, Input, Button, SearchIcon, HStack, Text, Box, FlatList, Spinner, VStack } from "native-base";
+import { View, Heading, Input, Button, SearchIcon, HStack, Text, Box, FlatList, Spinner, VStack, Center } from "native-base";
 import { useEffect, useState } from "react";
 import useFetch from "../../../../hooks/useFetch";
 import { HOST } from "../../../../config/variables";
 import { ListRenderItemInfo } from "react-native";
+import useAuth from "../../../../hooks/useAuth";
+import ErrorAlert from "../../../../components/ErrorAlert";
 
 const AddFriendPage = () => {
 
@@ -50,17 +52,35 @@ const AddFriendPage = () => {
 
 const ProfilePreview = ({itemData}: any) => {
     const userData = itemData.item;
+    const [request, setRequest] = useState<RequestInfo>();
+    const {data, isPending, error, statusCode} = useFetch(request);
+    const {authToken} = useAuth();
 
     const onSendFriendRequestPressed = () => {
         const userId = userData.userId;
-        //Send fetch request using POST (useFetch?)
+        
+        setRequest(new Request(`${HOST}/api/sendfriendrequest`,
+            {
+                method: "POST",
+                mode: "cors",
+                headers: {
+                    "Accept": "*/*",
+                    "Content-Type": "application/json",
+                    "Authorization": `JWT ${authToken}`
+                },
+                body: JSON.stringify({
+                    targetUserId: userId,
+                })
+            }
+        ));
     }
 
     return (
         <Box bg="white" rounded="md" p={2}>
             <Heading>{`${userData.firstName} ${userData.lastName}`}</Heading>
             <Text>@{userData.username}</Text>
-            <Button m={2} onPress={onSendFriendRequestPressed}>Send friend request</Button>
+            <Button m={2} onPress={onSendFriendRequestPressed} isLoading={isPending} isDisabled={statusCode === 209}>{statusCode === 209 ? "Request sent!" : "Send friend request"}</Button>
+            <Center>{error && <ErrorAlert error={statusCode === 409 ? "Cannot send as there is already a relationship." : `${error}(${statusCode})`}/>}</Center>
         </Box>
     );
 }

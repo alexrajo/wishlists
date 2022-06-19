@@ -69,7 +69,7 @@ const CreateNewListPage = ({navigation}: any) => {
                         <Box flex={3} borderColor="gray.300" borderWidth={1} rounded="md" bg="white">
                             <ScrollView height={160} rounded="md">
                                 <VStack flex={1}>
-                                    {items.map((itemText: string, index: number) => <ItemsListItem itemText={itemText} index={index} selectedIndex={selectedItemIndex} onPress={setSelectedItemIndex}/>)}
+                                    {items.map((itemText: string, index: number) => <ItemsListItem itemText={itemText} index={index} key={index} selectedIndex={selectedItemIndex} onPress={setSelectedItemIndex}/>)}
                                 </VStack>
                             </ScrollView>
                         </Box>
@@ -118,7 +118,7 @@ const CreateItemModal = ({showModal, setShowModal, onConfirm}: {showModal: boole
     );
 }
 
-const ItemsListItem = ({index, itemText, selectedIndex, onPress}: {index: number, itemText: string, selectedIndex?: number, onPress?: React.Dispatch<React.SetStateAction<number | undefined>>}) => {
+const ItemsListItem = ({key, index, itemText, selectedIndex, onPress}: {key?: number, index: number, itemText: string, selectedIndex?: number, onPress?: React.Dispatch<React.SetStateAction<number | undefined>>}) => {
     return (
         <Pressable key={index} onPress={() => {
             if (onPress) {

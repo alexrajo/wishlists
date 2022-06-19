@@ -28,6 +28,15 @@ interface User {
     email?: string,
 }
 
+interface Friendship {
+    friendshipId: number,
+    initiatorId: number,
+    receiverId: number,
+    confirmed: boolean,
+    receiver?: User,
+    initiator?: User,
+}
+
 interface AuthResponse {
     authToken?: string,
     refreshToken?: string,

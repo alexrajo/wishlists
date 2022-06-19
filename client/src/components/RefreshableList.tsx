@@ -6,7 +6,7 @@ import useAuth from "../hooks/useAuth";
 import useFetch from "../hooks/useFetch";
 import { HOST } from "../config/variables";
 
-const RefreshableList = ({children, endpoint, placeholder, onPress}: {children?: React.ReactNode, endpoint: string, placeholder?: React.ReactNode, onPress?: ((data: any) => void) | null | undefined}) => {
+const RefreshableList = ({children, endpoint, placeholder, keyExtractor, itemDataToContent, onPress}: {children?: React.ReactNode, endpoint: string, placeholder?: React.ReactNode, keyExtractor: (arg0: any) => string, itemDataToContent: (arg0: ListRenderItemInfo<any>) => React.ReactNode, onPress?: ((data: any) => void) | null | undefined}) => {
     const {authToken} = useAuth();
 
     const newRequestObject = () => {
@@ -42,8 +42,8 @@ const RefreshableList = ({children, endpoint, placeholder, onPress}: {children?:
                     <FlatList 
                         style={styles.list} 
                         data={data} 
-                        renderItem={(itemData: ListRenderItemInfo<Wishlist>) => renderListPreview(itemData, onPress)} 
-                        keyExtractor={item => item.wishlistId.toString()}
+                        renderItem={(itemData: ListRenderItemInfo<any>) => renderListPreview(itemData, itemDataToContent, onPress)} 
+                        keyExtractor={keyExtractor}
                         refreshControl={<RefreshControl refreshing={isPending} onRefresh={refresh}/>}
                         height="100%"
                     />
@@ -56,13 +56,12 @@ const RefreshableList = ({children, endpoint, placeholder, onPress}: {children?:
     );
 }
 
-const renderListPreview = (itemData: ListRenderItemInfo<Wishlist>, onPress?: ((data: any) => void) | null | undefined) => (
+const renderListPreview = (itemData: ListRenderItemInfo<any>, itemDataToContent: (arg0: ListRenderItemInfo<any>) => React.ReactNode, onPress?: ((data: any) => void) | null | undefined) => (
     <ListButton onPress={() => {
         if (!onPress) return;
         onPress(itemData.item)
     }}>
-        <Text fontSize={"md"} fontWeight={"semibold"}>{itemData.item.title}</Text>
-        <Text>{itemData.item.description}</Text>
+        {itemDataToContent(itemData)}
     </ListButton>
 );
 

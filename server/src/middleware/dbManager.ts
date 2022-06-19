@@ -83,42 +83,6 @@ export const retrieveUserLists = async (req: AuthorizationRequest, res: Response
     }
 }
 
-export const getFriends = async (req: AuthorizationRequest, res: Response) => {
-    const user = req.user;
-    if (!user) return res.sendStatus(401);
-
-    try {
-        const friendships = await prisma.friendship.findMany({
-            where: {
-                confirmed: true,
-                OR: [
-                    {initiatorId: user.userId},
-                    {receiverId: user.userId},
-                 ]
-            }
-        });
-        const friendIds = friendships.map(
-            (friendship: Friendship) => friendship.initiatorId == user.userId ? friendship.receiverId : friendship.initiatorId
-        );
-        const friends = await prisma.user.findMany({
-            where: {
-                userId: {in: friendIds},
-            },
-            select: {
-                userId: true,
-                username: true,
-                firstName: true,
-                lastName: true,
-            }
-        });
-        const formattedLists = stringifyComplexJSON(friends);
-        return res.status(200).json(JSON.parse(formattedLists));
-    } catch (e) {
-        console.error(e);
-        return res.sendStatus(500);
-    }
-}
-
 export const getOwnProfile = async (req: AuthorizationRequest, res: Response) => {
     const signedUserData = req.user;
     if (!signedUserData) return res.sendStatus(401);
@@ -228,6 +192,27 @@ export const createWishlist = async (req: AuthorizationRequest, res: Response) =
     }
 }
 
+export const deleteWishlist = async (req: AuthorizationRequest, res: Response) => {
+    const { wishlistId } = req.body;
+    if (!wishlistId) return res.status(400).send("Missing id!");
+    
+    const user = req.user;
+    if(!user) return res.sendStatus(500);
+
+    try {
+        const deletedWishlist = await prisma.wishlist.delete({
+            where: {
+                wishlistId: BigInt(wishlistId),
+            },
+        });
+        const formattedData = stringifyComplexJSON(deleteWishlist);
+        return res.status(200).json(JSON.parse(formattedData));
+    } catch (e) {
+        console.error(e);
+        return res.sendStatus(500);
+    }
+}
+
 export const searchForUsersByUsername = async (req: Request, res: Response) => {
     try {
         const {username} = req.body;
@@ -249,6 +234,118 @@ export const searchForUsersByUsername = async (req: Request, res: Response) => {
         });
         return res.status(200).json(users);
     } catch {
+        return res.sendStatus(500);
+    }
+}
+
+export const getFriends = async (req: AuthorizationRequest, res: Response) => {
+    const user = req.user;
+    if (!user) return res.sendStatus(401);
+
+    try {
+        const friendships = await prisma.friendship.findMany({
+            where: {
+                confirmed: true,
+                OR: [
+                    {initiatorId: user.userId},
+                    {receiverId: user.userId},
+                 ]
+            }
+        });
+        const friendIds = friendships.map(
+            (friendship: Friendship) => friendship.initiatorId == user.userId ? friendship.receiverId : friendship.initiatorId
+        );
+        const friends = await prisma.user.findMany({
+            where: {
+                userId: {in: friendIds},
+            },
+            select: {
+                userId: true,
+                username: true,
+                firstName: true,
+                lastName: true,
+            }
+        });
+        const formattedData = stringifyComplexJSON(friends);
+        return res.status(200).json(JSON.parse(formattedData));
+    } catch (e) {
+        console.error(e);
+        return res.sendStatus(500);
+    }
+}
+
+export const getOutgoingFriendships = async (req: AuthorizationRequest, res: Response) => {
+    const user = req.user;
+    if (!user) return res.sendStatus(401);
+
+    try {
+        const friendships = await prisma.friendship.findMany({
+            where: {
+                confirmed: false,
+                initiatorId: user.userId,
+            },
+            include: {
+                receiver: true,
+            }
+        });
+        const formattedData = stringifyComplexJSON(friendships);
+        return res.status(200).json(JSON.parse(formattedData));
+    } catch (e) {
+        console.error(e);
+        return res.sendStatus(500);
+    }
+}
+
+export const getIncomingFriendships = async (req: AuthorizationRequest, res: Response) => {
+    const user = req.user;
+    if (!user) return res.sendStatus(401);
+
+    try {
+        const friendships = await prisma.friendship.findMany({
+            where: {
+                confirmed: false,
+                receiverId: user.userId,
+            },
+            include: {
+                initiator: true,
+            }
+        });
+        const formattedData = stringifyComplexJSON(friendships);
+        return res.status(200).json(JSON.parse(formattedData));
+    } catch (e) {
+        console.error(e);
+        return res.sendStatus(500);
+    }
+}
+
+export const sendFriendRequest = async (req: AuthorizationRequest, res: Response) => {
+    try {
+        const {targetUserId} = req.body;
+        const user = req.user;
+        if (!user) throw new Error("No user connected to request!");
+        if (user.userId === targetUserId) return res.sendStatus(400);
+
+        const existingFriendship = await prisma.friendship.findFirst({
+            where: {
+                OR: [
+                    {initiatorId: user.userId, receiverId: targetUserId},
+                    {initiatorId: targetUserId, receiverId: user.userId},
+                ]
+            }
+        });
+        if (existingFriendship !== null) return res.sendStatus(409);
+
+        const newFriendship = await prisma.friendship.create({
+            data: {
+                initiatorId: user.userId,
+                receiverId: targetUserId,
+                confirmed: false,
+            }
+        });
+        //Possible to send a notification to the receiving end here
+        return res.status(201).send("Sent friend request!");
+    } catch (e) {
+        console.error(e);
         return res.sendStatus(500);
     }
 }

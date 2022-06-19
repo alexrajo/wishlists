@@ -41,7 +41,7 @@ model Wishlist {
   ownerId     Int     @map("owner_id")
   title       String  @db.VarChar(25)
   description String? @db.VarChar(128)
-  items       Item[] @relation("itemsTowishlists")
+  items       Item[] @relation("itemTowishlist")
 
   @@map("wishlists")
 }
@@ -70,6 +70,6 @@ model Item {
   name               String   @db.VarChar(32)
   claimedByUserId    Int? @map("claimed_by_user_id")
   users              User?    @relation("itemsTousers", fields: [claimedByUserId], references: [userId], onDelete: NoAction, onUpdate: NoAction, map: "fk_claimed_by_user")
-  wishlists          Wishlist @relation("itemsTowishlists", fields: [wishlistId], references: [wishlistId], onDelete: NoAction, onUpdate: NoAction, map: "fk_wishlist")
+  wishlist           Wishlist @relation("itemTowishlist", fields: [wishlistId], references: [wishlistId], onDelete: Cascade, onUpdate: NoAction, map: "fk_wishlist")
   @@map("items")
 }
