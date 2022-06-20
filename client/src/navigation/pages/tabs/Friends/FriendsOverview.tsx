@@ -1,33 +1,43 @@
-import { View, Box, HStack, Text, Divider, Fab, Icon } from "native-base";
-import { useEffect, useState } from "react";
+import { View, Box, HStack, Text, Divider, Fab, Icon, Center, Spinner } from "native-base";
+import { useState } from "react";
 import { Pressable } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
+import useAuth from "../../../../hooks/useAuth";
 import RefreshableList from "../../../../components/RefreshableList";
+import { Friendship, ListItemRenderer } from "../../../../config/types";
+import ListButton from "../../../../components/ListButton";
 
 const FriendsOverview = ({navigation}: any) => {
+    const {userData} = useAuth();
     const [selectedSection, setSelectedSection] = useState(0);
-    const [endpoint, setEndpoint] = useState("/api/friends");
 
     const onAddFriendPressed = () => {
         navigation.navigate("AddFriend");
     }
 
-    useEffect(() => {
+    const friendshipListItemRenderer: ListItemRenderer<Friendship> = ({item: friendship}) => {        
+        if (userData === undefined) return null;
         switch (selectedSection) {
-            case (0):
-                setEndpoint("/api/friends");
-                break;
-            case (1):
-                setEndpoint("/api/incomingfriendships");
-                break;
-            case (2):
-                setEndpoint("/api/outgoingfriendships");
-                break;
+            case 1:
+                return !friendship.confirmed && 
+                        friendship.initiator !== undefined &&
+                        friendship.receiverId === userData.userId ? 
+                            <ListButton><Text>@{friendship.initiator.username}</Text></ListButton> 
+                        : null;
+            case 2:
+                return !friendship.confirmed && 
+                        friendship.receiver !== undefined &&
+                        friendship.initiatorId === userData.userId ? 
+                            <ListButton><Text>@{friendship.receiver.username}</Text></ListButton> 
+                        : null;
             default:
-                setEndpoint("/api/friends");
-                break;
+                return friendship.confirmed && 
+                        friendship.initiator !== undefined && 
+                        friendship.receiver !== undefined ? 
+                            <ListButton><Text>@{friendship.initiatorId === userData.userId ? friendship.receiver.username : friendship.initiator.username}</Text></ListButton> 
+                       : null;
         }
-    }, [selectedSection]);
+    }
 
     return (
         <View flex={1}>
@@ -47,20 +57,9 @@ const FriendsOverview = ({navigation}: any) => {
                 </HStack>
             </Box>
             <RefreshableList 
-                endpoint={endpoint} 
-                placeholder={<Text>This page is empty, send a friend request to someone!</Text>}
-                keyExtractor={(item: Friendship) => item.friendshipId.toString()}
-                itemDataToContent={
-                    (itemData) => {
-                        const friendship: Friendship = itemData.item;
-                        const user = friendship.receiver || friendship.initiator;
-
-                        return <>{user && <>
-                            <Text>{`${user.firstName} ${user.lastName}`}</Text>
-                            <Text>@{user.username}</Text>
-                        </>}</>
-                    }
-                }
+                endpoint="/api/friendships" 
+                keyExtractor={(friendship: Friendship) => friendship.friendshipId.toString()}
+                itemRenderer={friendshipListItemRenderer}
             />
             <Fab onPress={onAddFriendPressed} bg="white" renderInPortal={false} shadow={2} size="md" icon={<Icon color="black" as={AntDesign} name="adduser" size="md"/>}/>
         </View>

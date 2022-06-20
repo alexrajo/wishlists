@@ -4,7 +4,7 @@ import useAuth from "./useAuth";
 const useFetch = (req?: RequestInfo) => {
     const {refreshAuthToken} = useAuth();
     const [isPending, setIsPending] = useState(false);
-    const [error, setError] = useState<string|null>(null);
+    const [error, setError] = useState<string>();
     const [data, setData] = useState<any>(null); //Change type from any
     const [statusCode, setStatusCode] = useState<number>();
 
@@ -13,7 +13,7 @@ const useFetch = (req?: RequestInfo) => {
 
         setData(null);
         setIsPending(true);
-        setError(null);
+        setError(undefined);
         fetch(req)
         .then(res => {
             setStatusCode(res.status);

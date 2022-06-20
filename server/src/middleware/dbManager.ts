@@ -238,76 +238,35 @@ export const searchForUsersByUsername = async (req: Request, res: Response) => {
     }
 }
 
-export const getFriends = async (req: AuthorizationRequest, res: Response) => {
+export const getAllFriendships = async (req: AuthorizationRequest, res: Response) => {
     const user = req.user;
     if (!user) return res.sendStatus(401);
 
     try {
         const friendships = await prisma.friendship.findMany({
             where: {
-                confirmed: true,
                 OR: [
                     {initiatorId: user.userId},
                     {receiverId: user.userId},
-                 ]
-            }
-        });
-        const friendIds = friendships.map(
-            (friendship: Friendship) => friendship.initiatorId == user.userId ? friendship.receiverId : friendship.initiatorId
-        );
-        const friends = await prisma.user.findMany({
-            where: {
-                userId: {in: friendIds},
-            },
-            select: {
-                userId: true,
-                username: true,
-                firstName: true,
-                lastName: true,
-            }
-        });
-        const formattedData = stringifyComplexJSON(friends);
-        return res.status(200).json(JSON.parse(formattedData));
-    } catch (e) {
-        console.error(e);
-        return res.sendStatus(500);
-    }
-}
-
-export const getOutgoingFriendships = async (req: AuthorizationRequest, res: Response) => {
-    const user = req.user;
-    if (!user) return res.sendStatus(401);
-
-    try {
-        const friendships = await prisma.friendship.findMany({
-            where: {
-                confirmed: false,
-                initiatorId: user.userId,
+                ]
             },
             include: {
-                receiver: true,
-            }
-        });
-        const formattedData = stringifyComplexJSON(friendships);
-        return res.status(200).json(JSON.parse(formattedData));
-    } catch (e) {
-        console.error(e);
-        return res.sendStatus(500);
-    }
-}
-
-export const getIncomingFriendships = async (req: AuthorizationRequest, res: Response) => {
-    const user = req.user;
-    if (!user) return res.sendStatus(401);
-
-    try {
-        const friendships = await prisma.friendship.findMany({
-            where: {
-                confirmed: false,
-                receiverId: user.userId,
-            },
-            include: {
-                initiator: true,
+                receiver: {
+                    select: {
+                        userId: true,
+                        username: true,
+                        firstName: true,
+                        lastName: true,
+                    }
+                },
+                initiator: {
+                    select: {
+                        userId: true,
+                        username: true,
+                        firstName: true,
+                        lastName: true,
+                    }
+                },
             }
         });
         const formattedData = stringifyComplexJSON(friendships);

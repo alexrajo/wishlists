@@ -1,3 +1,5 @@
+import { ListRenderItemInfo } from "react-native";
+
 interface SignUpData {
     firstName: string | undefined,
     lastName: string | undefined,
@@ -37,7 +39,23 @@ interface Friendship {
     initiator?: User,
 }
 
+interface SignedUserData {
+    userId: number;
+    username: string;
+}
+
 interface AuthResponse {
     authToken?: string,
     refreshToken?: string,
+    userData?: SignedUserData,
 }
+
+interface RefreshableListProps {
+    children?: React.ReactNode;
+    endpoint: string;
+    placeholder?: React.ReactNode;
+    keyExtractor: (arg0: any) => string;
+    itemRenderer: (item: ListRenderItemInfo<any>) => ListRenderItem<any>;
+}
+
+type ListItemRenderer<T> = (itemInfo: ListRenderItemInfo<T>) => JSX.Element | null;

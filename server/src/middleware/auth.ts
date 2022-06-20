@@ -52,6 +52,7 @@ export const authenticateUser = async (req: AuthenticationRequest, res: Response
                 return res.status(200).json({
                     refreshToken: newRefreshToken,
                     authToken: newAuthToken,
+                    userData: user,
                 });
             } catch {
                 return res.status(500).send("Error while trying to sign authentication token!");
@@ -107,6 +108,7 @@ export const refreshToken = async (req: AuthorizationRequest, res: Response) => 
                 const newAuthToken = jwt.sign(dataToSign, AUTH_TOKEN_SECRET, {expiresIn: "15m"});
                 return res.status(200).json({
                     authToken: newAuthToken,
+                    userData: dataToSign,
                 });
             }
             return res.sendStatus(401);

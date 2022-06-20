@@ -1,12 +1,14 @@
 import { useEffect, useState, useContext, createContext, Component, Context } from "react"
 import * as SecureStore from 'expo-secure-store';
 import { HOST } from "../config/variables";
+import { AuthResponse, SignedUserData, SignUpData } from "../config/types";
 
 interface AuthContextInterface {
     loggedIn: boolean;
     isPending: boolean;
     error?: string;
     authToken?: string;
+    userData?: SignedUserData;
     login: (username: string, password: string) => void;
     logout: () => void;
     signup: (signUpData: SignUpData) => void;
@@ -39,6 +41,7 @@ const useProvideAuth = () => {
     const [loggedIn, setLoggedIn] = useState(false);
     const [authToken, setAuthToken] = useState<string | undefined>();
     const [refreshToken, setRefreshToken] = useState<string | undefined>();
+    const [userData, setUserData] = useState<SignedUserData>();
     const [error, setError] = useState<string | undefined>();
     const [isPending, setIsPending] = useState(false);
     
@@ -66,6 +69,7 @@ const useProvideAuth = () => {
         }).then((data: AuthResponse) => {
             setRefreshToken(data.refreshToken);
             setAuthToken(data.authToken);
+            setUserData(data.userData);
             setLoggedIn(true);
         })
         .catch(e => {
@@ -89,7 +93,10 @@ const useProvideAuth = () => {
         }).then((res: Response) => {
             if (!res.ok) throw new Error(`Could not log out! Status: ${res.status}`);
             SecureStore.deleteItemAsync(refreshTokenSecureStoreKey)
-            .then(() => setLoggedIn(false))
+            .then(() => {
+                setLoggedIn(false);
+                setUserData(undefined);
+            })
             .catch(e => {
                 console.error(e);
             });
@@ -148,6 +155,7 @@ const useProvideAuth = () => {
             throw new Error("Could not refresh, please log in again!");
         }).then(data => {
             setAuthToken(data.authToken);
+            setUserData(data.userData);
             setLoggedIn(true);
         })
         .catch(e => {
@@ -169,7 +177,7 @@ const useProvideAuth = () => {
         getValueFromKey(refreshTokenSecureStoreKey).then(setRefreshToken);
     }, []);
 
-    return {loggedIn, authToken, error, isPending, login, logout, signup, refreshAuthToken}
+    return {loggedIn, authToken, error, isPending, userData, login, logout, signup, refreshAuthToken}
 }
 
 const useAuth = () => {

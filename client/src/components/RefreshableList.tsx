@@ -1,12 +1,12 @@
 import { View, Text, FlatList, Button, Center } from "native-base";
 import React, { useEffect, useState } from "react";
 import { GestureResponderEvent, ListRenderItemInfo, RefreshControl, StyleSheet } from "react-native";
-import ListButton from "./ListButton";
 import useAuth from "../hooks/useAuth";
 import useFetch from "../hooks/useFetch";
 import { HOST } from "../config/variables";
+import { RefreshableListProps } from "../config/types";
 
-const RefreshableList = ({children, endpoint, placeholder, keyExtractor, itemDataToContent, onPress}: {children?: React.ReactNode, endpoint: string, placeholder?: React.ReactNode, keyExtractor: (arg0: any) => string, itemDataToContent: (arg0: ListRenderItemInfo<any>) => React.ReactNode, onPress?: ((data: any) => void) | null | undefined}) => {
+const RefreshableList = ({children, endpoint, placeholder, keyExtractor, itemRenderer}: RefreshableListProps) => {
     const {authToken} = useAuth();
 
     const newRequestObject = () => {
@@ -42,7 +42,7 @@ const RefreshableList = ({children, endpoint, placeholder, keyExtractor, itemDat
                     <FlatList 
                         style={styles.list} 
                         data={data} 
-                        renderItem={(itemData: ListRenderItemInfo<any>) => renderListPreview(itemData, itemDataToContent, onPress)} 
+                        renderItem={itemRenderer} 
                         keyExtractor={keyExtractor}
                         refreshControl={<RefreshControl refreshing={isPending} onRefresh={refresh}/>}
                         height="100%"
@@ -55,15 +55,6 @@ const RefreshableList = ({children, endpoint, placeholder, keyExtractor, itemDat
         </View>
     );
 }
-
-const renderListPreview = (itemData: ListRenderItemInfo<any>, itemDataToContent: (arg0: ListRenderItemInfo<any>) => React.ReactNode, onPress?: ((data: any) => void) | null | undefined) => (
-    <ListButton onPress={() => {
-        if (!onPress) return;
-        onPress(itemData.item)
-    }}>
-        {itemDataToContent(itemData)}
-    </ListButton>
-);
 
 const styles = StyleSheet.create({
     list: {
