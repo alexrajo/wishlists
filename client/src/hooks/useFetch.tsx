@@ -15,13 +15,15 @@ const useFetch = (req?: RequestInfo) => {
         setIsPending(true);
         setError(undefined);
         fetch(req)
-        .then(res => {
+        .then(async res => {
             setStatusCode(res.status);
             if (!res.ok) {
                 if (res.status == 401) {
                     refreshAuthToken();
                 }
-                throw Error("Could not complete request.");
+                await res.text().then(text => {
+                    throw new Error(text);
+                });
             }
             return res;
         })

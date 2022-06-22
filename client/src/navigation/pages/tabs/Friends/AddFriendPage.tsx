@@ -80,7 +80,7 @@ const ProfilePreview = ({itemData}: any) => {
         <Box bg="white" rounded="md" p={2}>
             <Heading>{`${userData.firstName} ${userData.lastName}`}</Heading>
             <Text>@{userData.username}</Text>
-            <Button m={2} onPress={onSendFriendRequestPressed} isLoading={isPending} isDisabled={statusCode === 201}>{statusCode === 209 ? "Request sent!" : "Send friend request"}</Button>
+            <Button m={2} onPress={onSendFriendRequestPressed} isLoading={isPending} isDisabled={statusCode === 201}>{statusCode === 201 ? "Request sent!" : "Send friend request"}</Button>
             <Center>{error && <ErrorAlert error={statusCode === 409 ? "Cannot send as there is already a relationship." : `${error}(${statusCode})`}/>}</Center>
         </Box>
     );

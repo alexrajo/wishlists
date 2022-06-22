@@ -6,7 +6,7 @@ import useFetch from "../hooks/useFetch";
 import { HOST } from "../config/variables";
 import { RefreshableListProps } from "../config/types";
 
-const RefreshableList = ({children, endpoint, placeholder, keyExtractor, itemRenderer}: RefreshableListProps) => {
+const RefreshableList = ({children, endpoint, placeholder, refreshSignal, keyExtractor, itemRenderer}: RefreshableListProps) => {
     const {authToken} = useAuth();
 
     const newRequestObject = () => {
@@ -30,6 +30,11 @@ const RefreshableList = ({children, endpoint, placeholder, keyExtractor, itemRen
     useEffect(() => {
         setRequest(newRequestObject());
     }, [authToken, endpoint]);
+
+    useEffect(() => {
+        if (refreshSignal === undefined) return;
+        refresh();
+    }, [refreshSignal]);
 
     return (
         <View>

@@ -185,7 +185,7 @@ export const createWishlist = async (req: AuthorizationRequest, res: Response) =
             }
         });
         if (!newWishlist) return res.sendStatus(500);
-        return res.status(200).send("Wishlist created!");
+        return res.status(201).json({message: "Wishlist created!"});
     } catch (e) {
         console.error(e);
         return res.sendStatus(500);
@@ -205,7 +205,7 @@ export const deleteWishlist = async (req: AuthorizationRequest, res: Response) =
                 wishlistId: BigInt(wishlistId),
             },
         });
-        const formattedData = stringifyComplexJSON(deleteWishlist);
+        const formattedData = stringifyComplexJSON(deletedWishlist);
         return res.status(200).json(JSON.parse(formattedData));
     } catch (e) {
         console.error(e);
@@ -302,9 +302,42 @@ export const sendFriendRequest = async (req: AuthorizationRequest, res: Response
             }
         });
         //Possible to send a notification to the receiving end here
-        return res.status(201).send("Sent friend request!");
+        return res.status(201).json({message: "Sent friend request!"});
     } catch (e) {
         console.error(e);
         return res.sendStatus(500);
+    }
+}
+
+export const deleteFriendship = async (req: AuthorizationRequest, res: Response) => {
+    try {
+        const {friendshipId: targetFriendshipId}: {friendshipId?: string} = req.body;
+        if (!targetFriendshipId) return res.status(400).send("Missing input!");
+
+        const user = req.user;
+        if (!user) throw new Error("No user connected to request!");
+
+        const targetFriendship = await prisma.friendship.findUnique({
+            where: {
+                friendshipId: BigInt(targetFriendshipId),
+            }
+        });
+
+        if (targetFriendship === null) return res.status(404).send("No friendship with that ID exists!");
+        if (!(targetFriendship.initiatorId === user.userId || targetFriendship.receiverId === user.userId)) {
+            return res.sendStatus(401);
+        }
+
+        const deletedFriendship = await prisma.friendship.delete({
+            where: {
+                friendshipId: BigInt(targetFriendshipId),
+            }
+        });
+
+        if (deletedFriendship === null) throw new Error("Friendship was not deleted due to an unknown error!");
+        return res.status(200).json({message: "Friendship deleted!"});
+    } catch (e) {
+        console.error(e);
+        res.sendStatus(500);
     }
 }

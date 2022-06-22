@@ -2,7 +2,7 @@ import { Fab, Icon, Text } from "native-base";
 import { GestureResponderEvent, ListRenderItem, ListRenderItemInfo, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import RefreshableList from "../../../../components/RefreshableList";
-import ListButton from "../../../../components/ListButton";
+import {ListButton} from "../../../../components/ListElements";
 import { ListItemRenderer, Wishlist } from "../../../../config/types";
 
 const MyListsOverview = ({navigation}: {navigation: any}) => {

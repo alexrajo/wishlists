@@ -1,13 +1,13 @@
 import { Request, Response, NextFunction, Application } from "express";
 import {authorizeToken, authenticateUser, refreshToken, getAuthToken, authorizeRefreshToken} from "../middleware/auth";
-import {retrieveUserLists, getUserFromLoginInformation, registerUser, createWishlist, getOwnProfile, logoutUser, searchForUsersByUsername, deleteWishlist, sendFriendRequest, getAllFriendships} from "../middleware/dbManager";
+import {retrieveUserLists, getUserFromLoginInformation, registerUser, createWishlist, getOwnProfile, logoutUser, searchForUsersByUsername, deleteWishlist, sendFriendRequest, getAllFriendships, deleteFriendship} from "../middleware/dbManager";
 
 export default (app: Application) => {
 
-    let calls = 0;
+    let calls = 1;
 
     app.use("/api", (req: Request, res: Response, next: NextFunction) => {
-        console.log(`Accessing API endpoint... (${(calls++) + 1})`);
+        console.log(`Accessing API endpoint... (${calls++})`);
         next();
     });
 
@@ -18,6 +18,7 @@ export default (app: Application) => {
     app.post("/api/createlist", getAuthToken, authorizeToken, createWishlist);
     app.post("/api/deletewishlist", getAuthToken, authorizeToken, deleteWishlist);
     app.post("/api/sendfriendrequest", getAuthToken, authorizeToken, sendFriendRequest);
+    app.post("/api/deletefriendship", getAuthToken, authorizeToken, deleteFriendship);
     app.post("/api/init", getAuthToken, authorizeToken, (req: Request, res: Response) => {
         return res.sendStatus(200);
     });
