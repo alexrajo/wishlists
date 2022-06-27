@@ -1,4 +1,4 @@
-import { View, Box, HStack, Text, Divider, Fab, Icon, CloseIcon, Center } from "native-base";
+import { View, Box, HStack, Text, Divider, Fab, Icon, CloseIcon, Center, Button } from "native-base";
 import { useEffect, useRef, useState } from "react";
 import { Pressable } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
@@ -11,7 +11,7 @@ import { HOST } from "../../../../config/variables";
 import SimpleAlertDialog from "../../../../components/SimpleAlertDialog";
 import ErrorAlert from "../../../../components/ErrorAlert";
 
-interface CancelRequestComponentProps {
+interface DeleteFriendshipComponentWrapperProps {
     targetUser: LimitedUserInfo;
     friendshipId: number;
     setIsAlertDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -21,10 +21,16 @@ interface CancelRequestComponentProps {
         alertBody: string;
         onConfirm: () => void;
     }>>;
+    alertTitle?: string;
+    alertBody?: string;
 }
 
-const CancelRequestComponent: React.FC<CancelRequestComponentProps> = ({targetUser, friendshipId, setActionRequest, setAlertDialogInformation, setIsAlertDialogOpen}) => {
+interface DeleteFriendshipComponentProps extends DeleteFriendshipComponentWrapperProps {
+    alertTitle: string;
+    alertBody: string;
+}
 
+const DeleteFriendshipComponent: React.FC<DeleteFriendshipComponentProps> = ({targetUser, friendshipId, setActionRequest, setAlertDialogInformation, setIsAlertDialogOpen, alertTitle, alertBody}) => {
     const {authToken} = useAuth();
 
     const onCancelRequestConfirmed = () => {
@@ -48,8 +54,8 @@ const CancelRequestComponent: React.FC<CancelRequestComponentProps> = ({targetUs
     const onPress = () => {
         if (setAlertDialogInformation !== undefined) {
             setAlertDialogInformation({
-                alertTitle: "Cancel friend request",
-                alertBody: `Are you sure you want to cancel the friend request to @${targetUser.username}?`,
+                alertTitle: alertTitle,
+                alertBody: alertBody,
                 onConfirm: onCancelRequestConfirmed,
             });
         }
@@ -57,10 +63,24 @@ const CancelRequestComponent: React.FC<CancelRequestComponentProps> = ({targetUs
     }
 
     return (
-        <Pressable onPress={onPress}>
+        <Button colorScheme="red" variant="outline" onPress={onPress}>
             <CloseIcon/>
-        </Pressable>
+        </Button>
     );
+}
+
+const CancelRequestComponent: React.FC<DeleteFriendshipComponentWrapperProps> = (props) => {
+    return <DeleteFriendshipComponent {...props} 
+        alertTitle="Cancel friend request" 
+        alertBody={`Are you sure you want to cancel the friend request to @${props.targetUser.username}?`}
+    />
+}
+
+const DenyRequestComponent: React.FC<DeleteFriendshipComponentWrapperProps> = (props) => {
+    return <DeleteFriendshipComponent {...props} 
+        alertTitle="Deny friend request" 
+        alertBody={`Are you sure you want to deny the friend request from @${props.targetUser.username}?`}
+    />
 }
 
 const FriendsOverview = ({navigation}: any) => {
@@ -104,7 +124,14 @@ const FriendsOverview = ({navigation}: any) => {
                 return !confirmed && 
                         initiator !== undefined &&
                         receiverId === userData.userId ? 
-                            <ListBox><Text>@{initiator.username}</Text></ListBox> 
+                            <ListBox menucomponents={
+                                <HStack alignItems="center" space={2}>
+                                    <Button colorScheme="emerald" p={2}>Accept</Button>
+                                    <DenyRequestComponent targetUser={initiator} friendshipId={friendshipId} setActionRequest={setActionRequest} setAlertDialogInformation={setAlertDialogInformation} setIsAlertDialogOpen={setIsAlertDialogOpen}/>
+                                </HStack>
+                            }>
+                                <Text>@{initiator.username}</Text>
+                            </ListBox> 
                         : null;
             case 2:
                 return !confirmed && 

@@ -100,7 +100,7 @@ const ProfileSettingsPage = () => {
               </AlertDialog.Footer>
             </AlertDialog.Content>
           </AlertDialog>
-          <Button isLoading={isPending} bg={"red.500"} onPress={() => setIsLogoutAlertOpen(true)}>
+          <Button isLoading={isPending} colorScheme="red" onPress={() => setIsLogoutAlertOpen(true)}>
             LOG OUT
           </Button>
           <Spacer />
