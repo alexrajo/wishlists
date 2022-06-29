@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import { HOST } from "../../config/variables";
 import useFetch from "../../hooks/useFetch";
 import useAuth from "../../hooks/useAuth";
+import { Item, Wishlist } from "../../config/types";
 
 const ListViewingPage = ({route, navigation}: {route: {params: {wishlist: Wishlist}}, navigation: any}) => {
     const {wishlist} = route.params;
@@ -76,7 +77,7 @@ const ListViewingPage = ({route, navigation}: {route: {params: {wishlist: Wishli
               </AlertDialog.Body>
               <AlertDialog.Footer>
                 <Button variant="ghost" onPress={() => setIsDeleteAlertOpen(false)} ref={cancelRef}>Cancel</Button>
-                <Button onPress={onDeleteConfirmed} bg="red.500">Delete</Button>
+                <Button onPress={onDeleteConfirmed} colorScheme="rose">Delete</Button>
               </AlertDialog.Footer>
             </AlertDialog.Content>
           </AlertDialog>

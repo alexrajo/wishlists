@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction, Application } from "express";
 import {authorizeToken, authenticateUser, refreshToken, getAuthToken, authorizeRefreshToken} from "../middleware/auth";
-import {retrieveUserLists, getUserFromLoginInformation, registerUser, createWishlist, getOwnProfile, logoutUser, searchForUsersByUsername, deleteWishlist, sendFriendRequest, getAllFriendships, deleteFriendship} from "../middleware/dbManager";
+import {retrieveUserLists, getUserFromLoginInformation, registerUser, createWishlist, getOwnProfile, logoutUser, searchForUsersByUsername, deleteWishlist, sendFriendRequest, getAllFriendships, deleteFriendship, confirmFriendship} from "../middleware/dbManager";
 
 export default (app: Application) => {
 
@@ -19,10 +19,9 @@ export default (app: Application) => {
     app.post("/api/deletewishlist", getAuthToken, authorizeToken, deleteWishlist);
     app.post("/api/sendfriendrequest", getAuthToken, authorizeToken, sendFriendRequest);
     app.post("/api/deletefriendship", getAuthToken, authorizeToken, deleteFriendship);
-    app.post("/api/init", getAuthToken, authorizeToken, (req: Request, res: Response) => {
-        return res.sendStatus(200);
-    });
+    app.post("/api/acceptfriendship", getAuthToken, authorizeToken, confirmFriendship)
     app.post("/api/searchusers", searchForUsersByUsername);
+    app.post("/api/init", getAuthToken, authorizeToken, (res: Response) => res.sendStatus(200));
 
     app.get("/api/mylists", getAuthToken, authorizeToken, retrieveUserLists);
     app.get("/api/myprofile", getAuthToken, authorizeToken, getOwnProfile);

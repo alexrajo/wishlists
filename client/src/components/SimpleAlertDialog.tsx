@@ -22,7 +22,7 @@ const SimpleAlertDialog = ({title, bodyText, cancelText, confirmText, onConfirm,
             </AlertDialog.Body>
             <AlertDialog.Footer>
                 <Button variant="ghost" onPress={() => setIsAlertDialogOpen(false)} ref={cancelRef}>{cancelText}</Button>
-                <Button onPress={onConfirmButtonPressed} bg="red.500">{confirmText}</Button>
+                <Button onPress={onConfirmButtonPressed} colorScheme="rose">{confirmText}</Button>
             </AlertDialog.Footer>
             </AlertDialog.Content>
         </AlertDialog>

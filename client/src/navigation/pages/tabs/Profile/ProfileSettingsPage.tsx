@@ -15,7 +15,7 @@ import { useEffect, useState, useRef } from "react";
 import useAuth from "../../../../hooks/useAuth";
 import useTopStackNavigator from "../../../../hooks/useTopStackNavigator";
 
-const ProfileSettingsPage = () => {
+const ProfileSettingsPage = ({navigation}: {navigation: any}) => {
   const { loggedIn, isPending, logout } = useAuth();
 
   const [isLogoutAlertOpen, setIsLogoutAlertOpen] = useState(false);
@@ -30,6 +30,7 @@ const ProfileSettingsPage = () => {
 
   useEffect(() => {
     if (loggedIn) return;
+    navigation.navigate("Info");
     topStackNavigation.navigate("Login");
   }, [loggedIn]);
 
@@ -96,11 +97,11 @@ const ProfileSettingsPage = () => {
               </AlertDialog.Body>
               <AlertDialog.Footer>
                 <Button variant="ghost" onPress={() => setIsLogoutAlertOpen(false)} ref={cancelRef}>Cancel</Button>
-                <Button onPress={onLogoutConfirmed} bg="red.500">Log out</Button>
+                <Button onPress={onLogoutConfirmed} colorScheme="rose">Log out</Button>
               </AlertDialog.Footer>
             </AlertDialog.Content>
           </AlertDialog>
-          <Button isLoading={isPending} colorScheme="red" onPress={() => setIsLogoutAlertOpen(true)}>
+          <Button isLoading={isPending} colorScheme="rose" onPress={() => setIsLogoutAlertOpen(true)}>
             LOG OUT
           </Button>
           <Spacer />

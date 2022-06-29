@@ -84,7 +84,7 @@ const DenyRequestComponent: React.FC<DeleteFriendshipComponentWrapperProps> = (p
 }
 
 const FriendsOverview = ({navigation}: any) => {
-    const {userData} = useAuth();
+    const {userData, authToken} = useAuth();
     const [selectedSection, setSelectedSection] = useState(0);
     const [listRefreshSignal, setListRefreshSignal] = useState<number>();
     const [actionRequest, setActionRequest] = useState<RequestInfo>();
@@ -110,6 +110,29 @@ const FriendsOverview = ({navigation}: any) => {
         navigation.navigate("AddFriend");
     }
 
+    const onAcceptFriendRequestPressed = (friendshipId: number) => {
+        setActionRequest(new Request(`${HOST}/api/acceptfriendship`,
+            {
+                method: "POST",
+                mode: "cors",
+                headers: {
+                    "Accept": "*/*",
+                    "Content-Type": "application/json",
+                    "Authorization": `JWT ${authToken}`,
+                },
+                body: JSON.stringify({
+                    friendshipId: friendshipId,
+                }),
+            }
+        ));
+    }
+
+    const onViewProfilePressed = (user: LimitedUserInfo) => {
+        navigation.navigate("ViewFriend", {
+            profileData: user,
+        });
+    }
+
     const friendshipListItemRenderer: ListItemRenderer<Friendship> = ({item: friendship}) => {        
         if (userData === undefined) return null;
         const {friendshipId, confirmed, initiator, receiver, initiatorId, receiverId} = friendship;
@@ -126,7 +149,7 @@ const FriendsOverview = ({navigation}: any) => {
                         receiverId === userData.userId ? 
                             <ListBox menucomponents={
                                 <HStack alignItems="center" space={2}>
-                                    <Button colorScheme="emerald" p={2}>Accept</Button>
+                                    <Button colorScheme="emerald" p={2} onPress={() => onAcceptFriendRequestPressed(friendshipId)}>Accept</Button>
                                     <DenyRequestComponent targetUser={initiator} friendshipId={friendshipId} setActionRequest={setActionRequest} setAlertDialogInformation={setAlertDialogInformation} setIsAlertDialogOpen={setIsAlertDialogOpen}/>
                                 </HStack>
                             }>
@@ -143,7 +166,11 @@ const FriendsOverview = ({navigation}: any) => {
                 return confirmed && 
                         initiator !== undefined && 
                         receiver !== undefined ? 
-                            <ListButton><Text>@{initiatorId === userData.userId ? receiver.username : initiator.username}</Text></ListButton> 
+                            <ListButton onPress={() => {
+                                onViewProfilePressed(initiatorId === userData.userId ? receiver : initiator);
+                            }}>
+                                <Text>@{initiatorId === userData.userId ? receiver.username : initiator.username}</Text>
+                            </ListButton> 
                        : null;
         }
     }

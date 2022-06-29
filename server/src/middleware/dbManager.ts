@@ -338,6 +338,41 @@ export const deleteFriendship = async (req: AuthorizationRequest, res: Response)
         return res.status(200).json({message: "Friendship deleted!"});
     } catch (e) {
         console.error(e);
-        res.sendStatus(500);
+        return res.sendStatus(500);
+    }
+}
+
+export const confirmFriendship = async (req: AuthorizationRequest, res: Response) => {
+    try {
+        const {friendshipId: targetFriendshipId}: {friendshipId?: string} = req.body;
+        if (!targetFriendshipId) return res.status(400).send("Missing input!");
+
+        const user = req.user;
+        if (!user) throw new Error("No user connected to request!");
+
+        const targetFriendship = await prisma.friendship.findUnique({
+            where: {
+                friendshipId: BigInt(targetFriendshipId),
+            }
+        });
+
+        if (targetFriendship === null) return res.status(404).send("No friendship with that ID exists!");
+        if (!(targetFriendship.receiverId === user.userId)) {
+            return res.status(401).send("Cannot accept a friend request when you are not the target.");
+        }
+
+        const confirmedFriendship = await prisma.friendship.update({
+            where: {
+                friendshipId: BigInt(targetFriendshipId),
+            },
+            data: {
+                confirmed: true,
+            }
+        });
+
+        return res.status(200).json({message: "Friendship confirmed!"});
+    } catch (e) {
+        console.error(e);
+        return res.sendStatus(500);
     }
 }

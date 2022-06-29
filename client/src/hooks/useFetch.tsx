@@ -32,7 +32,9 @@ const useFetch = (req?: RequestInfo) => {
             setData(content);
         })
         .catch(err => {
-            setError(err.message);
+            if (statusCode !== undefined && statusCode.toString()[0] !== "2") {
+                setError(err.message);
+            }
         })
         .finally(() => {
             setIsPending(false);
