@@ -14,3 +14,7 @@ export interface AuthorizationRequest extends Request {
     user?: SignedUserData | null;
     token?: string;
 }
+
+export interface UserIdBasedConditionalRequest extends AuthorizationRequest {
+    targetUserId?: number;
+}

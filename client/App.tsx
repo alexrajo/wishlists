@@ -2,7 +2,7 @@ import { StatusBar } from 'expo-status-bar';
 import { extendTheme, NativeBaseProvider } from 'native-base';
 import StackNavigator from './src/navigation/StackNavigator';
 import { NavigationContainer } from '@react-navigation/native';
-import useAuth, {ProvideAuth} from './src/hooks/useAuth';
+import {ProvideAuth} from './src/hooks/useAuth';
 import React from 'react';
 
 export default () => {
@@ -32,8 +32,8 @@ export default () => {
 
   return (
     <NativeBaseProvider theme={theme}>
-      <StatusBar/>
       <NavigationContainer>
+        <StatusBar/>
         <ProvideAuth>
           <StackNavigator/>
         </ProvideAuth>

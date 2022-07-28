@@ -127,8 +127,9 @@ const FriendsOverview = ({navigation}: any) => {
         ));
     }
 
-    const onViewProfilePressed = (user: LimitedUserInfo) => {
+    const onViewProfilePressed = (user: LimitedUserInfo, friendshipId: number) => {
         navigation.navigate("ViewFriend", {
+            friendshipId: friendshipId,
             profileData: user,
         });
     }
@@ -167,7 +168,7 @@ const FriendsOverview = ({navigation}: any) => {
                         initiator !== undefined && 
                         receiver !== undefined ? 
                             <ListButton onPress={() => {
-                                onViewProfilePressed(initiatorId === userData.userId ? receiver : initiator);
+                                onViewProfilePressed(initiatorId === userData.userId ? receiver : initiator, friendshipId);
                             }}>
                                 <Text>@{initiatorId === userData.userId ? receiver.username : initiator.username}</Text>
                             </ListButton> 

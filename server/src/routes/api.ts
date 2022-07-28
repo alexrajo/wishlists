@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction, Application } from "express";
 import {authorizeToken, authenticateUser, refreshToken, getAuthToken, authorizeRefreshToken} from "../middleware/auth";
-import {retrieveUserLists, getUserFromLoginInformation, registerUser, createWishlist, getOwnProfile, logoutUser, searchForUsersByUsername, deleteWishlist, sendFriendRequest, getAllFriendships, deleteFriendship, confirmFriendship} from "../middleware/dbManager";
+import {getUserFromLoginInformation, registerUser, createWishlist, getOwnProfile, logoutUser, searchForUsersByUsername, deleteWishlist, sendFriendRequest, getAllFriendships, deleteFriendship, confirmFriendship, retrieveWishlistsByUserId} from "../middleware/dbManager";
+import { getUserIdFromAuthorizedUser } from "../middleware/misc";
 
 export default (app: Application) => {
 
@@ -23,8 +24,9 @@ export default (app: Application) => {
     app.post("/api/searchusers", searchForUsersByUsername);
     app.post("/api/init", getAuthToken, authorizeToken, (res: Response) => res.sendStatus(200));
 
-    app.get("/api/mylists", getAuthToken, authorizeToken, retrieveUserLists);
+    app.get("/api/mylists", getAuthToken, authorizeToken, getUserIdFromAuthorizedUser, retrieveWishlistsByUserId);
     app.get("/api/myprofile", getAuthToken, authorizeToken, getOwnProfile);
+    app.get("/api/getuserwishlists/:targetUserId", getAuthToken, authorizeToken, retrieveWishlistsByUserId);
     app.get("/api/feed", (req: Request, res: Response) => {
         return res.sendStatus(404);
     });

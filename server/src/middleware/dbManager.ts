@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction, json, urlencoded } from "express";
 import { PrismaClient, User, Friendship, Wishlist } from "@prisma/client";
-import { AuthenticationRequest, AuthorizationRequest, SignedUserData } from "../config/types";
+import { AuthenticationRequest, AuthorizationRequest, SignedUserData, UserIdBasedConditionalRequest } from "../config/types";
 import { hashPassword } from "./auth";
 
 const bcrypt = require("bcrypt");
@@ -62,14 +62,15 @@ export const getUserFromLoginInformation = async (req: AuthenticationRequest, re
     }
 }
 
-export const retrieveUserLists = async (req: AuthorizationRequest, res: Response) => {
-    const user = req.user;
-    if (!user) return res.sendStatus(401);
-
+export const retrieveWishlistsByUserId = async (req: UserIdBasedConditionalRequest, res: Response) => {
     try {
+        if (req.params.targetUserId !== undefined) {
+            req.targetUserId = parseInt(req.params.targetUserId);
+        }
+
         const lists = await prisma.wishlist.findMany({
             where: {
-                ownerId: user.userId,
+                ownerId: req.targetUserId,
             },
             include: {
                 items: true,
@@ -82,6 +83,8 @@ export const retrieveUserLists = async (req: AuthorizationRequest, res: Response
         return res.sendStatus(500);
     }
 }
+
+
 
 export const getOwnProfile = async (req: AuthorizationRequest, res: Response) => {
     const signedUserData = req.user;

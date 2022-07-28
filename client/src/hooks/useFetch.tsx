@@ -14,6 +14,7 @@ const useFetch = (req?: RequestInfo) => {
         setData(null);
         setIsPending(true);
         setError(undefined);
+        setStatusCode(undefined);
         fetch(req)
         .then(async res => {
             setStatusCode(res.status);
