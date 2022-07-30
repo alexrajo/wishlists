@@ -16,8 +16,9 @@ const ListViewingPage = ({route, navigation}: {route: {params: {wishlist: Wishli
     const [deleteRequest, setDeleteRequest] = useState<RequestInfo>();
     const {data: deleteResponseData, isPending: isDeleting, error: deletionError, statusCode: deletionStatusCode} = useFetch(deleteRequest);
 
-    const {authToken, loggedIn} = useAuth();
+    const {authToken, loggedIn, userData} = useAuth();
     const cancelRef = useRef(null);
+    const canShowSettings = loggedIn && userData !== undefined && userData.userId === wishlist.ownerId;
 
     const onDeleteConfirmed = () => {
         if (!isOwnWishlist) return;
@@ -62,25 +63,29 @@ const ListViewingPage = ({route, navigation}: {route: {params: {wishlist: Wishli
                     keyExtractor={item => item.itemId.toString()}
                 />
             </Center>
-            <Pressable position="absolute" right={5} top={5} onPress={() => setIsDeleteAlertOpen(true)}>
-                <MaterialIcons name="delete-forever" color="red" size={32}/>
-            </Pressable>
+            {canShowSettings &&
+                <>
+                <Pressable position="absolute" right={5} top={5} onPress={() => setIsDeleteAlertOpen(true)}>
+                    <MaterialIcons name="delete-forever" color="red" size={32}/>
+                </Pressable>
 
-            <AlertDialog leastDestructiveRef={cancelRef} onClose={() => setIsDeleteAlertOpen(false)} isOpen={isDeleteAlertOpen}>
-            <AlertDialog.Content>
-              <AlertDialog.Header>
-                <Text fontWeight="semibold">Delete wishlist</Text>
-                <AlertDialog.CloseButton/>
-              </AlertDialog.Header>
-              <AlertDialog.Body>
-                <Text>Are you sure you want to PERMANENTLY delete this wishlist?</Text>
-              </AlertDialog.Body>
-              <AlertDialog.Footer>
-                <Button variant="ghost" onPress={() => setIsDeleteAlertOpen(false)} ref={cancelRef}>Cancel</Button>
-                <Button onPress={onDeleteConfirmed} colorScheme="rose">Delete</Button>
-              </AlertDialog.Footer>
-            </AlertDialog.Content>
-          </AlertDialog>
+                <AlertDialog leastDestructiveRef={cancelRef} onClose={() => setIsDeleteAlertOpen(false)} isOpen={isDeleteAlertOpen}>
+                    <AlertDialog.Content>
+                    <AlertDialog.Header>
+                        <Text fontWeight="semibold">Delete wishlist</Text>
+                        <AlertDialog.CloseButton/>
+                    </AlertDialog.Header>
+                    <AlertDialog.Body>
+                        <Text>Are you sure you want to PERMANENTLY delete this wishlist?</Text>
+                    </AlertDialog.Body>
+                    <AlertDialog.Footer>
+                        <Button variant="ghost" onPress={() => setIsDeleteAlertOpen(false)} ref={cancelRef}>Cancel</Button>
+                        <Button onPress={onDeleteConfirmed} colorScheme="rose">Delete</Button>
+                    </AlertDialog.Footer>
+                    </AlertDialog.Content>
+                </AlertDialog>
+                </>
+          }
         </View>
     );
 }

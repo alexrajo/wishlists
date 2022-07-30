@@ -18,6 +18,7 @@ interface Item {
 
 interface Wishlist {
     wishlistId: number,
+    ownerId: number,
     title: string,
     description?: string,
     items: Array<Item>,
