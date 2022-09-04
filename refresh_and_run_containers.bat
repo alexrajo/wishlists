@@ -10,7 +10,7 @@ docker run -d --name wishlist-db-postgres-new -p 5432:5432 -v wishlist-psql-data
 
 cd ../server/
 docker build --rm --no-cache -t wishlist-app-node-backend ./
-docker run -d --name wishlist-node -p 3001:3001 --network wishlist-net wishlist-app-node-backend
+docker run -d --name wishlist-node -p 3001:3001 -v wishlist-app-images:/public/images --network wishlist-net wishlist-app-node-backend
 
 set /p DUMMY=Stop containers by pressing enter...
 docker stop wishlist-node

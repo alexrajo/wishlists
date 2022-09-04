@@ -14,6 +14,7 @@ import { ImageBackground, StyleSheet } from "react-native";
 import type { StackScreenProps } from "@react-navigation/stack";
 import useAuth from "../../hooks/useAuth";
 import ErrorAlert from "../../components/ErrorAlert";
+import DateInput from "../../components/DateInput";
 
 const RegisterScreen = ({navigation}: any) => {
   const [firstName, setFirstName] = useState<string | undefined>();
@@ -108,13 +109,15 @@ const RegisterScreen = ({navigation}: any) => {
             </FormControl.HelperText>
 
             <FormControl.Label>Date of birth</FormControl.Label>
-            <Input
+            {/* <Input
               type="text"
               placeholder="Date of birth"
               variant={"filled"}
               value={dateOfBirth}
               onChangeText={setDateOfBirth}
-            />
+            /> */}
+            <DateInput/>
+            
           </FormControl>
           <Button marginTop={5} isDisabled={!canProceed} isLoading={authIsPending} onPress={onRegisterPressed}>CREATE ACCOUNT</Button>
           <Box>
