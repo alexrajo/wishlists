@@ -7,7 +7,7 @@ interface SignUpData {
     username: string | undefined,
     email?: string,
     password: string | undefined,
-    dateOfBirth: string | undefined,
+    dateOfBirth: Date,
 }
 
 interface Item {

@@ -117,7 +117,7 @@ export const getOwnProfile = async (req: AuthorizationRequest, res: Response) =>
 export const registerUser = async (req: AuthenticationRequest, res: Response, next: NextFunction) => {
     try {
         console.log(req.body);
-        const {username, password, firstName, lastName, dateOfBirth, email}: {username: string, password: string, firstName: string, lastName: string, dateOfBirth: string, email?: string} = req.body;
+        const {username, password, firstName, lastName, dateOfBirth, email}: {username: string, password: string, firstName: string, lastName: string, dateOfBirth: Date, email?: string} = req.body;
         if (!(username && password && firstName && lastName && dateOfBirth) || (username && username.length < 1)) return res.status(400).send("Missing input!");
         if (illegalUsernameFormat.test(username)) return res.status(400).send("Invalid username!");
         if (email !== undefined && email !== "" && !isValidEmail(email)) return res.status(400).send("Invalid email!");
@@ -133,7 +133,7 @@ export const registerUser = async (req: AuthenticationRequest, res: Response, ne
                 password: hashedPassword,
                 firstName: firstName,
                 lastName: lastName,
-                dateOfBirth: new Date(dateOfBirth),
+                dateOfBirth: dateOfBirth,
                 email: isValidEmail(email) ? email!.toLowerCase() : undefined,
             }
         });

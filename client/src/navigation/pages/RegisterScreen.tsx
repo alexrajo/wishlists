@@ -14,7 +14,7 @@ import { ImageBackground, StyleSheet } from "react-native";
 import type { StackScreenProps } from "@react-navigation/stack";
 import useAuth from "../../hooks/useAuth";
 import ErrorAlert from "../../components/ErrorAlert";
-import DateInput from "../../components/DateInput";
+import RNDateTimePicker from "@react-native-community/datetimepicker";
 
 const RegisterScreen = ({navigation}: any) => {
   const [firstName, setFirstName] = useState<string | undefined>();
@@ -22,7 +22,7 @@ const RegisterScreen = ({navigation}: any) => {
   const [username, setUsername] = useState<string | undefined>();
   const [password, setPassword] = useState<string | undefined>();
   const [email, setEmail] = useState<string | undefined>();
-  const [dateOfBirth, setDateOfBirth] = useState<string | undefined>();
+  const [dateOfBirth, setDateOfBirth] = useState<Date>(new Date(2000, 1, 1));
   const [canProceed, setCanProceed] = useState(false);
   const {loggedIn, isPending: authIsPending, error: authError, signup} = useAuth();
 
@@ -40,6 +40,14 @@ const RegisterScreen = ({navigation}: any) => {
       dateOfBirth,
     });
   }
+
+  const onDateChange = (event: any, selectedDate?: Date) => {
+    const currentDate = selectedDate;
+
+    if (selectedDate !== undefined) {
+      setDateOfBirth(currentDate!);
+    }
+  };
 
   useEffect(() => {
     setCanProceed(firstName && lastName && username && password ? true : false);
@@ -116,7 +124,15 @@ const RegisterScreen = ({navigation}: any) => {
               value={dateOfBirth}
               onChangeText={setDateOfBirth}
             /> */}
-            <DateInput/>
+            <View style={styles.dateTimePicker}>
+              <RNDateTimePicker
+                testID="dateTimePicker"
+                value={dateOfBirth}
+                mode="date"
+                is24Hour={true}
+                onChange={onDateChange}
+              />
+            </View>
             
           </FormControl>
           <Button marginTop={5} isDisabled={!canProceed} isLoading={authIsPending} onPress={onRegisterPressed}>CREATE ACCOUNT</Button>
@@ -134,6 +150,9 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
+  dateTimePicker: {
+    width: 190
+  }
 });
 
 export default RegisterScreen;
