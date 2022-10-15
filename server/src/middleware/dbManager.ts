@@ -133,7 +133,7 @@ export const registerUser = async (req: AuthenticationRequest, res: Response, ne
                 password: hashedPassword,
                 firstName: firstName,
                 lastName: lastName,
-                dateOfBirth: dateOfBirth,
+                dateOfBirth: new Date(dateOfBirth),
                 email: isValidEmail(email) ? email!.toLowerCase() : undefined,
             }
         });
@@ -223,9 +223,7 @@ export const searchForUsersByUsername = async (req: Request, res: Response) => {
 
         const users = await prisma.user.findMany({
             where: {
-                username: {
-                    search: username,
-                }
+                username: username
             },
             take: 5,
             select: {

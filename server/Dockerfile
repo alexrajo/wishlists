@@ -1,10 +1,10 @@
-FROM node:16-alpine
+FROM node:18.9.0-alpine3.16
 WORKDIR /app
 COPY package*.json /app
 RUN npm install
 COPY . .
 EXPOSE 3001
-ENV DATABASE_URL="postgresql://postgres:postgres@wishlist-db-postgres-new:5432/wishlist-db"
+ENV DATABASE_URL=${DATABASE_URL}
 ENV PORT=3001
 RUN npx prisma generate
 CMD ["npm", "start"]
