@@ -223,9 +223,7 @@ export const searchForUsersByUsername = async (req: Request, res: Response) => {
 
         const users = await prisma.user.findMany({
             where: {
-                username: {
-                    search: username,
-                }
+                username: username
             },
             take: 5,
             select: {

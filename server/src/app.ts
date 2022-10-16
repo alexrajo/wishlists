@@ -1,4 +1,4 @@
-import { Request, Response, NextFunction } from "express";
+import { Request, Response } from "express";
 import api from "./routes/api";
 require("dotenv").config();
 
@@ -13,5 +13,6 @@ app.use(express.urlencoded({extended: true}));
 app.use(cors());
 
 api(app);
+app.get("/", (req: Request, res: Response) => res.status(404).send("There is nothing to show here"));
 
 app.listen(PORT, console.log(`Server listening on port ${PORT}`));
