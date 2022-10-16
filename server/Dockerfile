@@ -1,5 +1,5 @@
 FROM node:16-alpine
-WORKDIR ./
+WORKDIR /app
 COPY . .
 RUN npm install
 EXPOSE 3001
