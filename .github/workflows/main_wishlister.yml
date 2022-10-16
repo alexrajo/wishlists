@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy container app to Azure Web App - wishlister
+name: Build and deploy container app to Azure Web App - wishlister node backend
 
 on:
   push:
@@ -31,7 +31,7 @@ jobs:
       with:
         push: true
         tags: wishlistregistry.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_dc99863cf3014e4aaa2486f575491628 }}/wishlist-app-node-backend:${{ github.sha }}
-        file: ./Dockerfile
+        file: ./server/Dockerfile
 
   deploy:
     runs-on: ubuntu-latest
