@@ -26,12 +26,15 @@ jobs:
         username: ${{ secrets.AzureAppService_ContainerUsername_dc99863cf3014e4aaa2486f575491628 }}
         password: ${{ secrets.AzureAppService_ContainerPassword_f13b506d7b794ac18de05df1df357874 }}
 
+    - name: Move into directory
+      run: cd ./server
+
     - name: Build and push container image to registry
       uses: docker/build-push-action@v2
       with:
         push: true
         tags: wishlistregistry.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_dc99863cf3014e4aaa2486f575491628 }}/wishlist-app-node-backend:${{ github.sha }}
-        file: ./server/Dockerfile
+        file: ./Dockerfile
 
   deploy:
     runs-on: ubuntu-latest
