@@ -1,6 +1,7 @@
 FROM node:16-alpine
 WORKDIR /app
 COPY . .
+RUN ls
 RUN npm install
 EXPOSE 3001
 ENV DATABASE_URL="wishlisterdb.database.windows.net;database=wishlist-db;Authentication=Active Directory Default;"
