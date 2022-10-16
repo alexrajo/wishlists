@@ -1,6 +1,6 @@
 FROM node:16-alpine
 WORKDIR /app
-COPY . .
+COPY ./server .
 RUN ls
 RUN npm install
 EXPOSE 3001
