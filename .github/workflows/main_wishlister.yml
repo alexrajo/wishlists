@@ -30,7 +30,7 @@ jobs:
       uses: docker/build-push-action@v2
       with:
         push: true
-        tags: wishlistregistry.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_dc99863cf3014e4aaa2486f575491628 }}/wishlist-app-node-backend:latest
+        tags: wishlistregistry.azurecr.io/${{ secrets.AzureAppService_ContainerUsername_dc99863cf3014e4aaa2486f575491628 }}/wishlist-app-node-backend:${{ github.sha }}
         file: ./server/Dockerfile
 
   deploy:
