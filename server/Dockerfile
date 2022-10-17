@@ -4,7 +4,8 @@ COPY ./server .
 RUN ls
 RUN npm install
 EXPOSE 3001
-ENV DATABASE_URL="sqlserver://Server=wishlisterdb.database.windows.net;database=wishlist-db;Authentication=Active Directory Default;"
+ARG DATABASE_CONNECTION_STRING
+ENV DATABASE_URL=${DATABASE_CONNECTION_STRING}
 ENV PORT=3001
 RUN npx prisma generate
 CMD ["npm", "start"]
