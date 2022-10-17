@@ -133,7 +133,7 @@ export const registerUser = async (req: AuthenticationRequest, res: Response, ne
                 password: hashedPassword,
                 firstName: firstName,
                 lastName: lastName,
-                dateOfBirth: dateOfBirth,
+                dateOfBirth: new Date(dateOfBirth),
                 email: isValidEmail(email) ? email!.toLowerCase() : undefined,
             }
         });
