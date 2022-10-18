@@ -9,8 +9,6 @@ export default (app: Application) => {
 
     app.use("/api", (req: Request, res: Response, next: NextFunction) => {
         console.log(`Accessing API endpoint... (${calls++})`);
-        console.log(process.env.DATABASE_URL);
-        console.log(process.env.REFRESH_TOKEN_SECRET);
         next();
     });
 
