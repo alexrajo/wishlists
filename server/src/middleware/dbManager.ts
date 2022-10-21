@@ -20,6 +20,33 @@ const isValidEmail = (email: string | undefined) => {
     return true;
 }
 
+const getFriendshipFilter = (user: SignedUserData) => ({
+    where: {
+        OR: [
+            {initiatorId: user.userId},
+            {receiverId: user.userId},
+        ]
+    },
+    include: {
+        receiver: {
+            select: {
+                userId: true,
+                username: true,
+                firstName: true,
+                lastName: true,
+            }
+        },
+        initiator: {
+            select: {
+                userId: true,
+                username: true,
+                firstName: true,
+                lastName: true,
+            }
+        },
+    }
+});
+
 export const setUserRefreshToken = async (user: User, token: string) => {
     try {
         await prisma.user.update({
@@ -83,8 +110,6 @@ export const retrieveWishlistsByUserId = async (req: UserIdBasedConditionalReque
         return res.sendStatus(500);
     }
 }
-
-
 
 export const getOwnProfile = async (req: AuthorizationRequest, res: Response) => {
     const signedUserData = req.user;
@@ -244,32 +269,7 @@ export const getAllFriendships = async (req: AuthorizationRequest, res: Response
     if (!user) return res.sendStatus(401);
 
     try {
-        const friendships = await prisma.friendship.findMany({
-            where: {
-                OR: [
-                    {initiatorId: user.userId},
-                    {receiverId: user.userId},
-                ]
-            },
-            include: {
-                receiver: {
-                    select: {
-                        userId: true,
-                        username: true,
-                        firstName: true,
-                        lastName: true,
-                    }
-                },
-                initiator: {
-                    select: {
-                        userId: true,
-                        username: true,
-                        firstName: true,
-                        lastName: true,
-                    }
-                },
-            }
-        });
+        const friendships = await prisma.friendship.findMany(getFriendshipFilter(user));
         const formattedData = stringifyComplexJSON(friendships);
         return res.status(200).json(JSON.parse(formattedData));
     } catch (e) {
@@ -372,6 +372,32 @@ export const confirmFriendship = async (req: AuthorizationRequest, res: Response
         });
 
         return res.status(200).json({message: "Friendship confirmed!"});
+    } catch (e) {
+        console.error(e);
+        return res.sendStatus(500);
+    }
+}
+
+export const getFeed = async (req: AuthorizationRequest, res: Response) => {
+    const user = req.user;
+    if (!user) return res.sendStatus(401);
+
+    try {
+        const friendIds = await (await prisma.friendship.findMany(
+            getFriendshipFilter(user))
+        ).filter(friendship => friendship.confirmed).map(friendship => (
+            friendship.receiverId == user.userId) ? friendship.initiator.userId : friendship.receiver.userId
+        );
+        const selectedLists = await prisma.wishlist.findMany({
+            where: {
+                ownerId: {
+                    in: friendIds,
+                }
+            },
+            take: 10
+        });
+        const formattedData = stringifyComplexJSON(selectedLists);
+        return res.status(200).json(JSON.parse(formattedData));
     } catch (e) {
         console.error(e);
         return res.sendStatus(500);

@@ -1,1 +1,1 @@
-export const HOST = "http://172.28.80.1:3001";
+export const HOST = "https://wishlister.azurewebsites.net";
