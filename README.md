@@ -2,7 +2,7 @@
 
 This is a full stack application for sharing wishlists with friends and family. This makes it easy to know what people want for their birthday, for christmas, etc.
 
-This application is built on the PERN-stack using these frameworks, libraries and technologies:
+This application is built on the MSERN-stack using these frameworks, libraries and technologies:
 <ul>
     <li>Docker</li>
     <li>Client:
@@ -17,7 +17,7 @@ This application is built on the PERN-stack using these frameworks, libraries an
             <li>Nodejs</li>
             <li>Express</li>
             <li>Prisma</li>
-            <li>PostgreSQL</li>
+            <li>Microsoft SQL-Server</li>
         </ul>
     </li>
 </ul>
