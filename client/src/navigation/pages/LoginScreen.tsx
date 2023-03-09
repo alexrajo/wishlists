@@ -21,7 +21,12 @@ const LoginScreen = (props: any) => {
   const [password, setPassword] = useState<string>("");
   const [canProceed, setCanProceed] = useState(false);
 
-  const {loggedIn, isPending: authIsPending, error: authError, login} = useAuth();
+  const {
+    loggedIn,
+    isPending: authIsPending,
+    error: authError,
+    login,
+  } = useAuth();
 
   const onGoToRegisterScreenPressed = () => {
     props.navigation.navigate("Register");
@@ -29,7 +34,7 @@ const LoginScreen = (props: any) => {
 
   const onLoginPressed = () => {
     login(usernameOrEmail, password);
-  }
+  };
 
   useEffect(() => {
     if (loggedIn) {
@@ -44,7 +49,9 @@ const LoginScreen = (props: any) => {
   return (
     <View style={styles.container}>
       <Center style={styles.container} p={15}>
-      {!authIsPending && authError && !loggedIn && <ErrorAlert error={authError}/>}
+        {!authIsPending && authError && !loggedIn && (
+          <ErrorAlert error={authError} />
+        )}
         <Box alignItems={"center"}>
           <Heading>LOG IN</Heading>
           <FormControl>
@@ -68,7 +75,14 @@ const LoginScreen = (props: any) => {
               />
             </VStack>
           </FormControl>
-          <Button isDisabled={!canProceed} isLoading={authIsPending} isLoadingText="LOGGING IN" onPress={onLoginPressed}>LOG IN</Button>
+          <Button
+            isDisabled={!canProceed}
+            isLoading={authIsPending}
+            isLoadingText="LOGGING IN"
+            onPress={onLoginPressed}
+          >
+            LOG IN
+          </Button>
           <Box>
             <Text fontSize={"lg"}>Don't have an account?</Text>
             <Button onPress={onGoToRegisterScreenPressed}>
