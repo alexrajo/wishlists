@@ -17,13 +17,12 @@ import { useEffect, useState, useRef } from "react";
 import KeyboardAvoidingWrapper from "../../../../components/KeyboardAvoidingWrapper";
 import SimpleAlertDialog from "../../../../components/SimpleAlertDialog";
 import { ProfileStackParams } from "../../../../config/types";
+import { HOST } from "../../../../config/variables";
 import useAuth from "../../../../hooks/useAuth";
+import useFetch from "../../../../hooks/useFetch";
 import useTopStackNavigator from "../../../../hooks/useTopStackNavigator";
 
-type ProfileSettingsPageProps = StackScreenProps<
-  ProfileStackParams,
-  "Settings"
->;
+type ProfileSettingsPageProps = StackScreenProps<ProfileStackParams, "Settings">;
 
 type AlertProps = {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -48,16 +47,14 @@ const LogoutAlert = (props: AlertProps) => {
       onConfirm={onConfirm}
       confirmColor="rose"
     >
-      <Text>
-        Are you sure you want to log out? You will need to re-enter your login
-        information to log back in.
-      </Text>
+      <Text>Are you sure you want to log out? You will need to re-enter your login information to log back in.</Text>
     </SimpleAlertDialog>
   );
 };
 
 const PasswordChangeAlert = (props: AlertProps) => {
   const { isOpen, setIsOpen, onConfirm } = props;
+  const { authToken, refreshAuthToken } = useAuth();
 
   const [isValid, setIsValid] = useState(false);
   const [oldPassword, setOldPassword] = useState<string>();
@@ -69,7 +66,29 @@ const PasswordChangeAlert = (props: AlertProps) => {
     setNewPassword(undefined);
     setRepeatedPassword(undefined);
 
-    onConfirm();
+    // Send request to api
+    fetch(`${HOST}/api/changepassword`, {
+      method: "POST",
+      mode: "cors",
+      headers: {
+        Accept: "*/*",
+        "Content-Type": "application/json",
+        Authorization: `JWT ${authToken}`,
+      },
+      body: JSON.stringify({
+        oldPassword: oldPassword,
+        newPassword: newPassword,
+      }),
+    })
+      .then((res: Response) => {
+        if (res.status === 401) refreshAuthToken();
+        if (!res.ok) throw new Error("Could not update password " + res.status.toString());
+        setIsOpen(false);
+        onConfirm();
+      })
+      .catch((e) => {
+        console.error(e);
+      });
   };
 
   const checkInputValidity = () => {
@@ -122,10 +141,7 @@ const PasswordChangeAlert = (props: AlertProps) => {
   );
 };
 
-const ProfileSettingsPage = ({
-  navigation,
-  route,
-}: ProfileSettingsPageProps) => {
+const ProfileSettingsPage = ({ navigation, route }: ProfileSettingsPageProps) => {
   const { loggedIn, isPending, logout } = useAuth();
   const { firstName, lastName, email } = route.params || {};
   const [isEmailValid, setIsEmailValid] = useState(true);
@@ -135,8 +151,7 @@ const ProfileSettingsPage = ({
   const emailInput = useRef(email);
 
   const [isLogoutAlertOpen, setIsLogoutAlertOpen] = useState(false);
-  const [isChangePasswordAlertOpen, setIsChangePasswordAlertOpen] =
-    useState(false);
+  const [isChangePasswordAlertOpen, setIsChangePasswordAlertOpen] = useState(false);
 
   const topStackNavigation = useTopStackNavigator();
 
@@ -152,8 +167,7 @@ const ProfileSettingsPage = ({
   }, [loggedIn]);
 
   const checkEmailValidity = (email: string) => {
-    const valid =
-      email !== undefined ? email.match(EMAIL_REGEXP) !== null : false;
+    const valid = email !== undefined ? email.match(EMAIL_REGEXP) !== null : false;
     setIsEmailValid(valid);
   };
 
@@ -213,28 +227,18 @@ const ProfileSettingsPage = ({
                 ></Input>
                 <Button>OK</Button>
               </HStack>
-              <FormControl.ErrorMessage>
-                Email is invalid
-              </FormControl.ErrorMessage>
+              <FormControl.ErrorMessage>Email is invalid</FormControl.ErrorMessage>
               <FormControl.HelperText>
-                Having an email attached to your account makes it easier to
-                recover access to your account, should you forget your password.
+                Having an email attached to your account makes it easier to recover access to your account, should you
+                forget your password.
               </FormControl.HelperText>
             </FormControl>
             <Spacer />
-            <Button
-              isLoading={isPending}
-              colorScheme="rose"
-              onPress={() => setIsLogoutAlertOpen(true)}
-            >
+            <Button isLoading={isPending} colorScheme="rose" onPress={() => setIsLogoutAlertOpen(true)}>
               LOG OUT
             </Button>
             <Spacer />
-            <LogoutAlert
-              onConfirm={onLogoutConfirmed}
-              isOpen={isLogoutAlertOpen}
-              setIsOpen={setIsLogoutAlertOpen}
-            />
+            <LogoutAlert onConfirm={onLogoutConfirmed} isOpen={isLogoutAlertOpen} setIsOpen={setIsLogoutAlertOpen} />
             <PasswordChangeAlert
               onConfirm={() => {}}
               isOpen={isChangePasswordAlertOpen}
