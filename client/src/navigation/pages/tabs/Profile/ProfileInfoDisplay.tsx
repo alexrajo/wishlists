@@ -14,24 +14,29 @@ import useAuth from "../../../../hooks/useAuth";
 import { useEffect, useState } from "react";
 import useFetch from "../../../../hooks/useFetch";
 import { HOST } from "../../../../config/variables";
+import { SignUpData } from "../../../../config/types";
 
-const ProfileTab = ({navigation}: any) => {
+const ProfileTab = ({ navigation }: any) => {
   const { loggedIn, authToken } = useAuth();
 
-  const createNewRequest = () => (
+  const createNewRequest = () =>
     new Request(`${HOST}/api/myprofile`, {
       method: "GET",
       mode: "cors",
       headers: {
         Authorization: `JWT ${authToken}`,
       },
-    })
-  );
+    });
   const [request, setRequest] = useState(createNewRequest());
-  const { data: profileData, error: fetchError, isPending, refresh } = useFetch(request);
+  const {
+    data: profileData,
+    error: fetchError,
+    isPending,
+    refresh,
+  } = useFetch<SignUpData>(request);
 
   const onSettingsButtonPressed = () => {
-    navigation.navigate("Settings");
+    navigation.navigate("Settings", profileData);
   };
 
   useEffect(() => {
@@ -41,7 +46,12 @@ const ProfileTab = ({navigation}: any) => {
   return (
     <View flex={1}>
       <Center flex={1}>
-        {fetchError && <><Text color={"red.500"}>{fetchError}</Text><Button onPress={refresh}>Try again</Button></>}
+        {fetchError && (
+          <>
+            <Text color={"red.500"}>{fetchError}</Text>
+            <Button onPress={refresh}>Try again</Button>
+          </>
+        )}
         {profileData && (
           <Box rounded="md" style={styles.userInfoContainer}>
             <Pressable

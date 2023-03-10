@@ -1,32 +1,69 @@
 import { AlertDialog, Button, Text } from "native-base";
+import { ColorSchemeType } from "native-base/lib/typescript/components/types";
 import { useRef, useState } from "react";
 
-const SimpleAlertDialog = ({title, bodyText, cancelText, confirmText, onConfirm, isAlertDialogOpen, setIsAlertDialogOpen}: {title: string, bodyText: string, cancelText: string, confirmText: string, onConfirm: () => void, isAlertDialogOpen: boolean, setIsAlertDialogOpen: React.Dispatch<React.SetStateAction<boolean>>}) => {
-    
-    const cancelRef = useRef(null);
+type SimpleAlertDialogProps = {
+  title: string;
+  children: React.ReactNode;
+  cancelText?: string;
+  confirmText?: string;
+  onConfirm: () => void;
+  isAlertDialogOpen: boolean;
+  setIsAlertDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  confirmColor?: ColorSchemeType;
+  isConfirmationRestricted?: boolean;
+};
 
-    const onConfirmButtonPressed = () => {
-        setIsAlertDialogOpen(false);
-        onConfirm();
-    }
+const SimpleAlertDialog = (props: SimpleAlertDialogProps) => {
+  const {
+    title,
+    children,
+    cancelText,
+    confirmText,
+    onConfirm,
+    isAlertDialogOpen,
+    setIsAlertDialogOpen,
+    confirmColor,
+    isConfirmationRestricted,
+  } = props;
+  const cancelRef = useRef(null);
 
-    return (
-        <AlertDialog leastDestructiveRef={cancelRef} onClose={() => setIsAlertDialogOpen(false)} isOpen={isAlertDialogOpen}>
-            <AlertDialog.Content>
-            <AlertDialog.Header>
-                <Text fontWeight="semibold">{title}</Text>
-                <AlertDialog.CloseButton/>
-            </AlertDialog.Header>
-            <AlertDialog.Body>
-                <Text>{bodyText}</Text>
-            </AlertDialog.Body>
-            <AlertDialog.Footer>
-                <Button variant="ghost" onPress={() => setIsAlertDialogOpen(false)} ref={cancelRef}>{cancelText}</Button>
-                <Button onPress={onConfirmButtonPressed} colorScheme="rose">{confirmText}</Button>
-            </AlertDialog.Footer>
-            </AlertDialog.Content>
-        </AlertDialog>
-    );
-}
+  const onConfirmButtonPressed = () => {
+    setIsAlertDialogOpen(false);
+    onConfirm();
+  };
+
+  return (
+    <AlertDialog
+      leastDestructiveRef={cancelRef}
+      onClose={() => setIsAlertDialogOpen(false)}
+      isOpen={isAlertDialogOpen}
+    >
+      <AlertDialog.Content>
+        <AlertDialog.Header>
+          <Text fontWeight="semibold">{title}</Text>
+          <AlertDialog.CloseButton />
+        </AlertDialog.Header>
+        <AlertDialog.Body>{children}</AlertDialog.Body>
+        <AlertDialog.Footer>
+          <Button
+            variant="ghost"
+            onPress={() => setIsAlertDialogOpen(false)}
+            ref={cancelRef}
+          >
+            {cancelText !== undefined ? cancelText : "Cancel"}
+          </Button>
+          <Button
+            onPress={onConfirmButtonPressed}
+            colorScheme={confirmColor || "primary"}
+            isDisabled={isConfirmationRestricted}
+          >
+            {confirmText !== undefined ? confirmText : "Confirm"}
+          </Button>
+        </AlertDialog.Footer>
+      </AlertDialog.Content>
+    </AlertDialog>
+  );
+};
 
 export default SimpleAlertDialog;
