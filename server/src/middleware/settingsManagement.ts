@@ -1,6 +1,6 @@
 import { Response } from "express";
 import { AuthorizationRequest } from "../config/types";
-import { hashPassword, passwordIsCorrect } from "../utils/authUtils";
+import { hashPassword, isValidPassword, passwordIsCorrect } from "../utils/authUtils";
 import { getUserFromSignedData, updateUserData } from "./dbManagement";
 
 export const changePassword = async (req: AuthorizationRequest, res: Response) => {
@@ -12,6 +12,7 @@ export const changePassword = async (req: AuthorizationRequest, res: Response) =
   if (user === null) return res.status(404).send("Found no user in database with given information!");
 
   const { oldPassword, newPassword } = req.body;
+  if (!isValidPassword(newPassword)) return res.status(400).send("New password is invalid!");
   if (!(await passwordIsCorrect(user.password, oldPassword)))
     return res.status(401).send("Old password given is incorrect!");
 

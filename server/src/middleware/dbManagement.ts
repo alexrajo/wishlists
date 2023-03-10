@@ -6,7 +6,7 @@ import {
   SignedUserData,
   UserIdBasedConditionalRequest,
 } from "../config/types";
-import { hashPassword } from "../utils/authUtils";
+import { hashPassword, isValidPassword } from "../utils/authUtils";
 
 const illegalUsernameFormat = /[!-\/:-@[-`{-~ *+]/;
 const prisma = new PrismaClient();
@@ -187,7 +187,7 @@ export const registerUser = async (req: AuthenticationRequest, res: Response, ne
       return res.status(400).send("Missing input!");
     if (illegalUsernameFormat.test(username)) return res.status(400).send("Invalid username!");
     if (email !== undefined && email !== "" && !isValidEmail(email)) return res.status(400).send("Invalid email!");
-    if (password.length < 8) {
+    if (!isValidPassword(password)) {
       return res.status(400).send("Invalid password! Password cannot be shorter than 8 characters.");
     }
 

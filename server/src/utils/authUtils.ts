@@ -11,3 +11,7 @@ export const passwordIsCorrect = async (hashedRealPassword: string, givenPasswor
 
 export const hashPassword = async (plainTextPassword: string): Promise<string> =>
   bcrypt.hash(plainTextPassword, saltRounds);
+
+export const isValidPassword = (password: string) => {
+  return password.length >= 8;
+};

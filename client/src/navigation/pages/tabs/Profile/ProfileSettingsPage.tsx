@@ -82,7 +82,7 @@ const PasswordChangeAlert = (props: AlertProps) => {
     })
       .then((res: Response) => {
         if (res.status === 401) refreshAuthToken();
-        if (!res.ok) throw new Error("Could not update password " + res.status.toString());
+        if (!res.ok) throw new Error("Error when changing password, status: " + res.status.toString());
         setIsOpen(false);
         onConfirm();
       })
