@@ -61,7 +61,7 @@ const PasswordChangeAlert = (props: AlertProps) => {
   const [newPassword, setNewPassword] = useState<string>();
   const [repeatedPassword, setRepeatedPassword] = useState<string>();
 
-  const onChangeConfirmed = () => {
+  const onChangePasswordConfirmed = () => {
     setOldPassword(undefined);
     setNewPassword(undefined);
     setRepeatedPassword(undefined);
@@ -110,7 +110,7 @@ const PasswordChangeAlert = (props: AlertProps) => {
       cancelText="Cancel"
       isAlertDialogOpen={isOpen}
       setIsAlertDialogOpen={setIsOpen}
-      onConfirm={onChangeConfirmed}
+      onConfirm={onChangePasswordConfirmed}
       isConfirmationRestricted={!isValid}
       confirmColor="success"
     >
@@ -142,18 +142,43 @@ const PasswordChangeAlert = (props: AlertProps) => {
 };
 
 const ProfileSettingsPage = ({ navigation, route }: ProfileSettingsPageProps) => {
-  const { loggedIn, isPending, logout } = useAuth();
-  const { firstName, lastName, email } = route.params || {};
+  const { loggedIn, isPending, logout, authToken, refreshAuthToken } = useAuth();
+  const { firstName: initialFirstName, lastName: initialLastName, email } = route.params || {};
   const [isEmailValid, setIsEmailValid] = useState(true);
 
-  const firstNameInput = useRef(firstName);
-  const lastNameInput = useRef(lastName);
+  const firstNameInput = useRef(initialFirstName);
+  const lastNameInput = useRef(initialLastName);
   const emailInput = useRef(email);
 
   const [isLogoutAlertOpen, setIsLogoutAlertOpen] = useState(false);
   const [isChangePasswordAlertOpen, setIsChangePasswordAlertOpen] = useState(false);
 
   const topStackNavigation = useTopStackNavigator();
+
+  const onChangeNameClicked = () => {
+    if (firstNameInput.current === initialFirstName && lastNameInput.current === initialLastName) return;
+    // Send request to api
+    fetch(`${HOST}/api/changename`, {
+      method: "POST",
+      mode: "cors",
+      headers: {
+        Accept: "*/*",
+        "Content-Type": "application/json",
+        Authorization: `JWT ${authToken}`,
+      },
+      body: JSON.stringify({
+        firstName: firstNameInput.current,
+        lastName: lastNameInput.current,
+      }),
+    })
+      .then((res: Response) => {
+        if (res.status === 401) refreshAuthToken();
+        if (!res.ok) throw new Error("Error when changing name, status: " + res.status.toString());
+      })
+      .catch((e) => {
+        console.error(e);
+      });
+  };
 
   const onLogoutConfirmed = () => {
     setIsLogoutAlertOpen(false);
@@ -185,10 +210,12 @@ const ProfileSettingsPage = ({ navigation, route }: ProfileSettingsPageProps) =>
                   isRequired={true}
                   placeholder="Enter your first name"
                   flex={1}
-                  ref={firstNameInput}
-                  defaultValue={firstName}
+                  defaultValue={initialFirstName}
+                  onChangeText={(text) => {
+                    firstNameInput.current = text;
+                  }}
                 ></Input>
-                <Button>OK</Button>
+                <Button onPress={onChangeNameClicked}>OK</Button>
               </HStack>
             </FormControl>
             <FormControl>
@@ -199,10 +226,12 @@ const ProfileSettingsPage = ({ navigation, route }: ProfileSettingsPageProps) =>
                   isRequired={true}
                   placeholder="Enter your last name"
                   flex={1}
-                  ref={lastNameInput}
-                  defaultValue={lastName}
+                  defaultValue={initialLastName}
+                  onChangeText={(text) => {
+                    lastNameInput.current = text;
+                  }}
                 ></Input>
-                <Button>OK</Button>
+                <Button onPress={onChangeNameClicked}>OK</Button>
               </HStack>
             </FormControl>
             <FormControl>

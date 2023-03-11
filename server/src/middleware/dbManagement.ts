@@ -235,6 +235,29 @@ export const logoutUser = async (req: AuthorizationRequest, res: Response) => {
   return res.sendStatus(200);
 };
 
+export const setNameForUser = async (req: AuthorizationRequest, res: Response) => {
+  const signedUserData = req.user;
+  if (signedUserData === null || signedUserData === undefined) return res.sendStatus(401);
+  const { firstName, lastName } = req.body;
+  if (firstName === undefined || lastName === undefined) return res.sendStatus(400);
+
+  try {
+    const updatedUser = await prisma.user.update({
+      where: {
+        userId: signedUserData.userId,
+      },
+      data: {
+        firstName: firstName,
+        lastName: lastName,
+      },
+    });
+    return res.sendStatus(200);
+  } catch (err) {
+    console.error(err);
+    return res.sendStatus(500);
+  }
+};
+
 export const createWishlist = async (req: AuthorizationRequest, res: Response) => {
   const { title, description, items } = req.body;
   if (!title || !items) return res.sendStatus(400);

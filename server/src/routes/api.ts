@@ -20,6 +20,7 @@ import {
   confirmFriendship,
   retrieveWishlistsByUserId,
   getFeed,
+  setNameForUser,
 } from "../middleware/dbManagement";
 import { getUserIdFromAuthorizedUser } from "../middleware/misc";
 import { changePassword } from "../middleware/settingsManagement";
@@ -44,6 +45,7 @@ export default (app: Application) => {
   app.post("/api/searchusers", searchForUsersByUsername);
   app.post("/api/init", getAuthToken, authorizeToken, (res: Response) => res.sendStatus(200));
   app.post("/api/changepassword", getAuthToken, authorizeToken, changePassword);
+  app.post("/api/changename", getAuthToken, authorizeToken, setNameForUser);
 
   app.get("/api/mylists", getAuthToken, authorizeToken, getUserIdFromAuthorizedUser, retrieveWishlistsByUserId);
   app.get("/api/myprofile", getAuthToken, authorizeToken, getOwnProfile);
