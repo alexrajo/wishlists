@@ -6,6 +6,8 @@ import { useEffect, useState } from "react";
 import useFetch from "../../../../hooks/useFetch";
 import { SignUpData } from "../../../../config/types";
 import useAuthorizedRequest from "../../../../hooks/useAuthorizedRequest";
+import { useDispatch, useSelector } from "react-redux";
+import { setUserData } from "../../../../redux/userData";
 
 const ProfileInfoDisplay = ({ navigation }: any) => {
   const { authToken } = useAuth();
