@@ -1,39 +1,22 @@
-import {
-  Avatar,
-  View,
-  Center,
-  Box,
-  Heading,
-  Text,
-  VStack,
-  Button,
-} from "native-base";
+import { Avatar, View, Center, Box, Heading, Text, VStack, Button } from "native-base";
 import { MaterialCommunityIcons, FontAwesome5 } from "@expo/vector-icons";
 import { Pressable, StyleSheet } from "react-native";
 import useAuth from "../../../../hooks/useAuth";
 import { useEffect, useState } from "react";
 import useFetch from "../../../../hooks/useFetch";
-import { HOST } from "../../../../config/variables";
 import { SignUpData } from "../../../../config/types";
+import useAuthorizedRequest from "../../../../hooks/useAuthorizedRequest";
 
-const ProfileTab = ({ navigation }: any) => {
-  const { loggedIn, authToken } = useAuth();
+const ProfileInfoDisplay = ({ navigation }: any) => {
+  const { authToken } = useAuth();
 
-  const createNewRequest = () =>
-    new Request(`${HOST}/api/myprofile`, {
-      method: "GET",
-      mode: "cors",
-      headers: {
-        Authorization: `JWT ${authToken}`,
-      },
-    });
+  const { getRequestObject: createNewRequest } = useAuthorizedRequest({
+    endpoint: "/api/myprofile",
+    method: "GET",
+  });
+
   const [request, setRequest] = useState(createNewRequest());
-  const {
-    data: profileData,
-    error: fetchError,
-    isPending,
-    refresh,
-  } = useFetch<SignUpData>(request);
+  const { data: profileData, error: fetchError, isPending, refresh } = useFetch<SignUpData>(request);
 
   const onSettingsButtonPressed = () => {
     navigation.navigate("Settings", profileData);
@@ -54,10 +37,7 @@ const ProfileTab = ({ navigation }: any) => {
         )}
         {profileData && (
           <Box rounded="md" style={styles.userInfoContainer}>
-            <Pressable
-              style={styles.openSettingsButton}
-              onPress={onSettingsButtonPressed}
-            >
+            <Pressable style={styles.openSettingsButton} onPress={onSettingsButtonPressed}>
               <FontAwesome5 name="cog" size={20} color="gray" />
             </Pressable>
             <VStack space={5} style={styles.userInfoInnerContainer}>
@@ -65,9 +45,7 @@ const ProfileTab = ({ navigation }: any) => {
                 {DefaultAvatarIcon()}
               </Avatar>
               <Box alignItems={"center"}>
-                <Heading textAlign="center">
-                  {profileData.firstName + " " + profileData.lastName}
-                </Heading>
+                <Heading textAlign="center">{profileData.firstName + " " + profileData.lastName}</Heading>
                 <Text fontStyle={"italic"}>@{profileData.username}</Text>
               </Box>
               <Text>{profileData.email}</Text>
@@ -76,9 +54,8 @@ const ProfileTab = ({ navigation }: any) => {
                   About me:
                 </Text>
                 <Text marginX={3} fontStyle="italic">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi
-                  finibus tempor urna pretium convallis. Sed ut ipsum ornare
-                  lorem eleifend sollicitudin.
+                  Lorem ipsum dolor sit amet, consectetur adipiscing elit. Morbi finibus tempor urna pretium convallis.
+                  Sed ut ipsum ornare lorem eleifend sollicitudin.
                 </Text>
               </Box>
             </VStack>
@@ -89,9 +66,7 @@ const ProfileTab = ({ navigation }: any) => {
   );
 };
 
-const DefaultAvatarIcon = () => (
-  <MaterialCommunityIcons name="account" size={80} color="white" />
-);
+const DefaultAvatarIcon = () => <MaterialCommunityIcons name="account" size={80} color="white" />;
 
 const styles = StyleSheet.create({
   userInfoContainer: {
@@ -124,4 +99,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default ProfileTab;
+export default ProfileInfoDisplay;

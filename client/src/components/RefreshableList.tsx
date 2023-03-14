@@ -5,66 +5,67 @@ import useAuth from "../hooks/useAuth";
 import useFetch from "../hooks/useFetch";
 import { HOST } from "../config/variables";
 import { RefreshableListProps } from "../config/types";
+import useAuthorizedRequest from "../hooks/useAuthorizedRequest";
 
-const RefreshableList = ({children, endpoint, placeholder, refreshSignal, keyExtractor, itemRenderer}: RefreshableListProps) => {
-    const {authToken} = useAuth();
+type ListData<T> = T[];
 
-    const newRequestObject = () => {
-        return new Request(
-            HOST + endpoint,
-            {
-                method: "GET",
-                mode: "cors",
-                headers: {
-                    "Accept": "*/*",
-                    "Content-Type": "application/json",
-                    "Authorization": `JWT ${authToken}`,
-                }
-            }
-        );
-    }
+const RefreshableList = <T,>({
+  children,
+  endpoint,
+  placeholder,
+  refreshSignal,
+  keyExtractor,
+  itemRenderer,
+}: RefreshableListProps) => {
+  const { authToken } = useAuth();
 
-    const [request, setRequest] = useState(newRequestObject());
-    const {data, error: fetchError, isPending, refresh} = useFetch(request);
+  const { getRequestObject } = useAuthorizedRequest({
+    endpoint: endpoint,
+    method: "GET",
+  });
 
-    useEffect(() => {
-        setRequest(newRequestObject());
-    }, [authToken, endpoint]);
+  const [request, setRequest] = useState(getRequestObject());
+  const { data, error: fetchError, isPending, refresh } = useFetch<ListData<T>>(request);
 
-    useEffect(() => {
-        if (refreshSignal === undefined) return;
-        refresh();
-    }, [refreshSignal]);
+  useEffect(() => {
+    setRequest(getRequestObject()); // A little bit unsure about how getRequestObject() reacts to authToken changes
+  }, [authToken, endpoint]);
 
-    return (
-        <View>
-            <Center>
-                {fetchError && <Text color={"red.500"}>{fetchError}</Text>}
-                {data && data.length < 1 && placeholder}
+  useEffect(() => {
+    if (refreshSignal === undefined) return;
+    refresh();
+  }, [refreshSignal]);
 
-                {!fetchError ?
-                <>
-                    <FlatList 
-                        style={styles.list} 
-                        data={data} 
-                        renderItem={itemRenderer} 
-                        keyExtractor={keyExtractor}
-                        refreshControl={<RefreshControl refreshing={isPending} onRefresh={refresh}/>}
-                        height="100%"
-                    />
-                    {children}
-                </>
-                : <Button onPress={refresh}>Try again</Button>
-                }
-            </Center>
-        </View>
-    );
-}
+  return (
+    <View>
+      <Center>
+        {fetchError && <Text color={"red.500"}>{fetchError}</Text>}
+        {data && data.length < 1 && placeholder}
+
+        {!fetchError ? (
+          <>
+            <FlatList
+              style={styles.list}
+              data={data}
+              renderItem={itemRenderer}
+              keyExtractor={keyExtractor}
+              refreshControl={<RefreshControl refreshing={isPending} onRefresh={refresh} />}
+              height="100%"
+            />
+            {children}
+          </>
+        ) : (
+          <Button onPress={refresh}>Try again</Button>
+        )}
+      </Center>
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
-    list: {
-        width: "100%",
-    },
+  list: {
+    width: "100%",
+  },
 });
 
 export default RefreshableList;

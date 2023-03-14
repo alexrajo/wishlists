@@ -65,11 +65,11 @@ interface RefreshableListProps {
   itemRenderer: (item: ListRenderItemInfo<any>) => ListRenderItem<any>;
 }
 
-type ListItemRenderer<T> = (
-  itemInfo: ListRenderItemInfo<T>
-) => JSX.Element | null;
+type ListItemRenderer<T> = (itemInfo: ListRenderItemInfo<T>) => JSX.Element | null;
 type ReactChildrenProp = React.ReactNode | React.ReactNode[] | undefined;
 
 interface ProfileStackParams extends ParamListBase {
   Settings: SignUpData;
 }
+
+type HttpRequestMethod = "GET" | "POST" | "PUT" | "DELETE";

@@ -19,6 +19,7 @@ import SimpleAlertDialog from "../../../../components/SimpleAlertDialog";
 import { ProfileStackParams } from "../../../../config/types";
 import { HOST } from "../../../../config/variables";
 import useAuth from "../../../../hooks/useAuth";
+import useAuthorizedRequest from "../../../../hooks/useAuthorizedRequest";
 import useFetch from "../../../../hooks/useFetch";
 import useTopStackNavigator from "../../../../hooks/useTopStackNavigator";
 
@@ -61,34 +62,25 @@ const PasswordChangeAlert = (props: AlertProps) => {
   const [newPassword, setNewPassword] = useState<string>();
   const [repeatedPassword, setRepeatedPassword] = useState<string>();
 
+  const changePasswordRequest = useAuthorizedRequest({
+    endpoint: "/api/changepassword",
+    method: "POST",
+    onSuccess: () => {
+      setIsOpen(false);
+      onConfirm();
+    },
+  });
+
   const onChangePasswordConfirmed = () => {
     setOldPassword(undefined);
     setNewPassword(undefined);
     setRepeatedPassword(undefined);
 
     // Send request to api
-    fetch(`${HOST}/api/changepassword`, {
-      method: "POST",
-      mode: "cors",
-      headers: {
-        Accept: "*/*",
-        "Content-Type": "application/json",
-        Authorization: `JWT ${authToken}`,
-      },
-      body: JSON.stringify({
-        oldPassword: oldPassword,
-        newPassword: newPassword,
-      }),
-    })
-      .then((res: Response) => {
-        if (res.status === 401) refreshAuthToken();
-        if (!res.ok) throw new Error("Error when changing password, status: " + res.status.toString());
-        setIsOpen(false);
-        onConfirm();
-      })
-      .catch((e) => {
-        console.error(e);
-      });
+    changePasswordRequest.send({
+      oldPassword: oldPassword,
+      newPassword: newPassword,
+    });
   };
 
   const checkInputValidity = () => {
@@ -155,29 +147,18 @@ const ProfileSettingsPage = ({ navigation, route }: ProfileSettingsPageProps) =>
 
   const topStackNavigation = useTopStackNavigator();
 
+  const changeNameRequest = useAuthorizedRequest({
+    endpoint: "/api/changename",
+    method: "POST",
+  });
+
   const onChangeNameClicked = () => {
     if (firstNameInput.current === initialFirstName && lastNameInput.current === initialLastName) return;
     // Send request to api
-    fetch(`${HOST}/api/changename`, {
-      method: "POST",
-      mode: "cors",
-      headers: {
-        Accept: "*/*",
-        "Content-Type": "application/json",
-        Authorization: `JWT ${authToken}`,
-      },
-      body: JSON.stringify({
-        firstName: firstNameInput.current,
-        lastName: lastNameInput.current,
-      }),
-    })
-      .then((res: Response) => {
-        if (res.status === 401) refreshAuthToken();
-        if (!res.ok) throw new Error("Error when changing name, status: " + res.status.toString());
-      })
-      .catch((e) => {
-        console.error(e);
-      });
+    changeNameRequest.send({
+      firstName: firstNameInput.current,
+      lastName: lastNameInput.current,
+    });
   };
 
   const onLogoutConfirmed = () => {
