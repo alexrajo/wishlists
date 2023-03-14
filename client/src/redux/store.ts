@@ -2,13 +2,16 @@ import { configureStore } from "@reduxjs/toolkit";
 import userDataReducer from "./userData";
 import authReducer from "./auth";
 
-export default configureStore({
+export const store = configureStore({
   reducer: {
-    auth: authReducer,
     userData: userDataReducer,
+    auth: authReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: false,
     }),
 });
+
+export type RootState = ReturnType<typeof store.getState>;
+export type AppDispatch = typeof store.dispatch;

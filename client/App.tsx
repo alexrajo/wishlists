@@ -2,8 +2,9 @@ import { StatusBar } from "expo-status-bar";
 import { extendTheme, NativeBaseProvider } from "native-base";
 import StackNavigator from "./src/navigation/StackNavigator";
 import { NavigationContainer } from "@react-navigation/native";
-import { ProvideAuth } from "./src/hooks/useAuth";
 import React from "react";
+import { Provider } from "react-redux";
+import { store } from "./src/redux/store";
 
 export default () => {
   const theme = extendTheme({
@@ -38,9 +39,9 @@ export default () => {
     <NativeBaseProvider theme={theme}>
       <NavigationContainer>
         <StatusBar />
-        <ProvideAuth>
+        <Provider store={store}>
           <StackNavigator />
-        </ProvideAuth>
+        </Provider>
       </NavigationContainer>
     </NativeBaseProvider>
   );

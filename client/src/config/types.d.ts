@@ -34,6 +34,7 @@ interface LimitedUserInfo {
 
 interface User extends LimitedUserInfo {
   email?: string;
+  dateOfBirth?: Date;
 }
 
 interface Friendship {
