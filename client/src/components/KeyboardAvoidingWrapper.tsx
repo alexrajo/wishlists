@@ -11,7 +11,7 @@ const KeyboardAvoidingWrapper = (props: KeyboardAvoidingWrapperProps) => {
   return (
     <KeyboardAvoidingView
       flex={1}
-      behavior={Platform.OS === "ios" ? "padding" : "position"}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
       keyboardVerticalOffset={Platform.OS === "ios" ? 64 : 0}
     >
       {children}
