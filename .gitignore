@@ -185,3 +185,5 @@ $RECYCLE.BIN/
 
 #sql test commands
 commands.sql
+
+**/.idea
