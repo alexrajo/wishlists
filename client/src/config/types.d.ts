@@ -2,7 +2,7 @@ import { ParamListBase } from "@react-navigation/native";
 import React from "react";
 import { ListRenderItemInfo } from "react-native";
 
-interface SignUpData {
+export interface SignUpData {
   firstName: string | undefined;
   lastName: string | undefined;
   username: string | undefined;
@@ -11,13 +11,13 @@ interface SignUpData {
   dateOfBirth: Date;
 }
 
-interface Item {
+export interface Item {
   itemId: number;
   name: string;
   claimedById?: number;
 }
 
-interface Wishlist {
+export interface Wishlist {
   wishlistId: number;
   ownerId: number;
   title: string;
@@ -25,18 +25,21 @@ interface Wishlist {
   items: Array<Item>;
 }
 
-interface LimitedUserInfo {
+export interface LimitedUserInfo {
   userId: number;
   username: string;
   firstName: string;
   lastName: string;
 }
 
-interface User extends LimitedUserInfo {
+export interface User extends LimitedUserInfo {
   email?: string;
+  dateOfBirth?: Date;
 }
 
-interface Friendship {
+export type OptionalUserData = Partial<User>;
+
+export interface Friendship {
   friendshipId: number;
   initiatorId: number;
   receiverId: number;
@@ -45,18 +48,18 @@ interface Friendship {
   initiator?: LimitedUserInfo;
 }
 
-interface SignedUserData {
+export interface SignedUserData {
   userId: number;
   username: string;
 }
 
-interface AuthResponse {
+export interface AuthResponse {
   authToken?: string;
   refreshToken?: string;
   userData?: SignedUserData;
 }
 
-interface RefreshableListProps {
+export interface RefreshableListProps {
   children?: React.ReactNode;
   endpoint: string;
   placeholder?: React.ReactNode;
@@ -65,11 +68,13 @@ interface RefreshableListProps {
   itemRenderer: (item: ListRenderItemInfo<any>) => ListRenderItem<any>;
 }
 
-type ListItemRenderer<T> = (itemInfo: ListRenderItemInfo<T>) => JSX.Element | null;
+export type ListItemRenderer<T> = (
+  itemInfo: ListRenderItemInfo<T>
+) => JSX.Element | null;
 type ReactChildrenProp = React.ReactNode | React.ReactNode[] | undefined;
 
-interface ProfileStackParams extends ParamListBase {
+export interface ProfileStackParams extends ParamListBase {
   Settings: SignUpData;
 }
 
-type HttpRequestMethod = "GET" | "POST" | "PUT" | "DELETE";
+export type HttpRequestMethod = "GET" | "POST" | "PUT" | "DELETE";
