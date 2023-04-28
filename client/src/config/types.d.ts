@@ -53,10 +53,14 @@ export interface SignedUserData {
   username: string;
 }
 
-export interface AuthResponse {
+export interface AuthorizationResponse {
   authToken?: string;
   refreshToken?: string;
   userData?: SignedUserData;
+}
+
+export interface AuthenticationResponse extends AuthorizationResponse {
+  userData?: Required<User>;
 }
 
 export interface RefreshableListProps {

@@ -20,14 +20,13 @@ import useFetch from "../../hooks/useFetch";
 import useAuth from "../../hooks/useAuth";
 import { Item, Wishlist } from "../../config/types";
 import SimpleAlertDialog from "../../components/SimpleAlertDialog";
+import { StackScreenProps } from "@react-navigation/stack";
+import { FriendsStackParamList } from "./tabs/Friends/FriendsStackNavigator";
 
-const ListViewingPage = ({
-  route,
-  navigation,
-}: {
-  route: { params: { wishlist: Wishlist } };
-  navigation: any;
-}) => {
+type ListViewingPageProps = StackScreenProps<FriendsStackParamList, "ViewList">;
+
+const ListViewingPage = (props: ListViewingPageProps) => {
+  const { navigation, route } = props;
   const { wishlist } = route.params;
   const items = wishlist.items;
   const isOwnWishlist = true;

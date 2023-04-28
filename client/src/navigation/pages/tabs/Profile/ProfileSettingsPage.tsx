@@ -23,7 +23,10 @@ import useAuthorizedRequest from "../../../../hooks/useAuthorizedRequest";
 import useFetch from "../../../../hooks/useFetch";
 import useTopStackNavigator from "../../../../hooks/useTopStackNavigator";
 
-type ProfileSettingsPageProps = StackScreenProps<ProfileStackParams, "Settings">;
+type ProfileSettingsPageProps = StackScreenProps<
+  ProfileStackParams,
+  "Settings"
+>;
 
 type AlertProps = {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -48,7 +51,10 @@ const LogoutAlert = (props: AlertProps) => {
       onConfirm={onConfirm}
       confirmColor="rose"
     >
-      <Text>Are you sure you want to log out? You will need to re-enter your login information to log back in.</Text>
+      <Text>
+        Are you sure you want to log out? You will need to re-enter your login
+        information to log back in.
+      </Text>
     </SimpleAlertDialog>
   );
 };
@@ -133,9 +139,17 @@ const PasswordChangeAlert = (props: AlertProps) => {
   );
 };
 
-const ProfileSettingsPage = ({ navigation, route }: ProfileSettingsPageProps) => {
-  const { loggedIn, isPending, logout, authToken, refreshAuthToken } = useAuth();
-  const { firstName: initialFirstName, lastName: initialLastName, email } = route.params || {};
+const ProfileSettingsPage = ({
+  navigation,
+  route,
+}: ProfileSettingsPageProps) => {
+  const { loggedIn, isPending, logout, authToken, refreshAuthToken } =
+    useAuth();
+  const {
+    firstName: initialFirstName,
+    lastName: initialLastName,
+    email,
+  } = route.params || {};
   const [isEmailValid, setIsEmailValid] = useState(true);
 
   const firstNameInput = useRef(initialFirstName);
@@ -143,7 +157,8 @@ const ProfileSettingsPage = ({ navigation, route }: ProfileSettingsPageProps) =>
   const emailInput = useRef(email);
 
   const [isLogoutAlertOpen, setIsLogoutAlertOpen] = useState(false);
-  const [isChangePasswordAlertOpen, setIsChangePasswordAlertOpen] = useState(false);
+  const [isChangePasswordAlertOpen, setIsChangePasswordAlertOpen] =
+    useState(false);
 
   const topStackNavigation = useTopStackNavigator();
 
@@ -153,7 +168,11 @@ const ProfileSettingsPage = ({ navigation, route }: ProfileSettingsPageProps) =>
   });
 
   const onChangeNameClicked = () => {
-    if (firstNameInput.current === initialFirstName && lastNameInput.current === initialLastName) return;
+    if (
+      firstNameInput.current === initialFirstName &&
+      lastNameInput.current === initialLastName
+    )
+      return;
     // Send request to api
     changeNameRequest.send({
       firstName: firstNameInput.current,
@@ -173,7 +192,8 @@ const ProfileSettingsPage = ({ navigation, route }: ProfileSettingsPageProps) =>
   }, [loggedIn]);
 
   const checkEmailValidity = (email: string) => {
-    const valid = email !== undefined ? email.match(EMAIL_REGEXP) !== null : false;
+    const valid =
+      email !== undefined ? email.match(EMAIL_REGEXP) !== null : false;
     setIsEmailValid(valid);
   };
 
@@ -237,18 +257,28 @@ const ProfileSettingsPage = ({ navigation, route }: ProfileSettingsPageProps) =>
                 ></Input>
                 <Button>OK</Button>
               </HStack>
-              <FormControl.ErrorMessage>Email is invalid</FormControl.ErrorMessage>
+              <FormControl.ErrorMessage>
+                Email is invalid
+              </FormControl.ErrorMessage>
               <FormControl.HelperText>
-                Having an email attached to your account makes it easier to recover access to your account, should you
-                forget your password.
+                Having an email attached to your account makes it easier to
+                recover access to your account, should you forget your password.
               </FormControl.HelperText>
             </FormControl>
             <Spacer />
-            <Button isLoading={isPending} colorScheme="rose" onPress={() => setIsLogoutAlertOpen(true)}>
+            <Button
+              isLoading={isPending}
+              colorScheme="rose"
+              onPress={() => setIsLogoutAlertOpen(true)}
+            >
               LOG OUT
             </Button>
             <Spacer />
-            <LogoutAlert onConfirm={onLogoutConfirmed} isOpen={isLogoutAlertOpen} setIsOpen={setIsLogoutAlertOpen} />
+            <LogoutAlert
+              onConfirm={onLogoutConfirmed}
+              isOpen={isLogoutAlertOpen}
+              setIsOpen={setIsLogoutAlertOpen}
+            />
             <PasswordChangeAlert
               onConfirm={() => {}}
               isOpen={isChangePasswordAlertOpen}

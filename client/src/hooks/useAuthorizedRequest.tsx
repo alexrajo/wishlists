@@ -34,7 +34,10 @@ const useAuthorizedRequest = (props: AuthorizedRequestProps) => {
       .then((res: Response) => {
         if (res.status === 401) refreshAuthToken();
         if (!res.ok) {
-          console.log(`Failure when calling endpoint '${endpoint}' with authorized request: ` + res.status.toString());
+          console.log(
+            `Failure when calling endpoint '${endpoint}' with authorized request: ` +
+              res.status.toString()
+          );
           if (onFailure !== undefined) onFailure(res.status);
           return;
         }

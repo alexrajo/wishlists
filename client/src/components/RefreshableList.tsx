@@ -1,6 +1,11 @@
 import { View, Text, FlatList, Button, Center } from "native-base";
 import React, { useEffect, useState } from "react";
-import { GestureResponderEvent, ListRenderItemInfo, RefreshControl, StyleSheet } from "react-native";
+import {
+  GestureResponderEvent,
+  ListRenderItemInfo,
+  RefreshControl,
+  StyleSheet,
+} from "react-native";
 import useAuth from "../hooks/useAuth";
 import useFetch from "../hooks/useFetch";
 import { HOST } from "../config/variables";
@@ -25,7 +30,12 @@ const RefreshableList = <T,>({
   });
 
   const [request, setRequest] = useState(getRequestObject());
-  const { data, error: fetchError, isPending, refresh } = useFetch<ListData<T>>(request);
+  const {
+    data,
+    error: fetchError,
+    isPending,
+    refresh,
+  } = useFetch<ListData<T>>(request);
 
   useEffect(() => {
     setRequest(getRequestObject()); // A little bit unsure about how getRequestObject() reacts to authToken changes
@@ -49,7 +59,9 @@ const RefreshableList = <T,>({
               data={data}
               renderItem={itemRenderer}
               keyExtractor={keyExtractor}
-              refreshControl={<RefreshControl refreshing={isPending} onRefresh={refresh} />}
+              refreshControl={
+                <RefreshControl refreshing={isPending} onRefresh={refresh} />
+              }
               height="100%"
             />
             {children}

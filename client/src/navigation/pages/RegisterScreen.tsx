@@ -16,7 +16,7 @@ import useAuth from "../../hooks/useAuth";
 import ErrorAlert from "../../components/ErrorAlert";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 
-const RegisterScreen = ({navigation}: any) => {
+const RegisterScreen = ({ navigation }: any) => {
   const [firstName, setFirstName] = useState<string | undefined>();
   const [lastName, setLastName] = useState<string | undefined>();
   const [username, setUsername] = useState<string | undefined>();
@@ -24,7 +24,12 @@ const RegisterScreen = ({navigation}: any) => {
   const [email, setEmail] = useState<string | undefined>();
   const [dateOfBirth, setDateOfBirth] = useState<Date>(new Date(2000, 1, 1));
   const [canProceed, setCanProceed] = useState(false);
-  const {loggedIn, isPending: authIsPending, error: authError, signup} = useAuth();
+  const {
+    loggedIn,
+    isPending: authIsPending,
+    error: authError,
+    signup,
+  } = useAuth();
 
   const onGoToLoginScreenPressed = () => {
     navigation.navigate("Login");
@@ -39,7 +44,7 @@ const RegisterScreen = ({navigation}: any) => {
       email,
       dateOfBirth,
     });
-  }
+  };
 
   const onDateChange = (event: any, selectedDate?: Date) => {
     const currentDate = selectedDate;
@@ -61,7 +66,9 @@ const RegisterScreen = ({navigation}: any) => {
   return (
     <View style={styles.container}>
       <Center style={styles.container} p={15}>
-        {!authIsPending && authError && !loggedIn && <ErrorAlert error={authError}/>}
+        {!authIsPending && authError && !loggedIn && (
+          <ErrorAlert error={authError} />
+        )}
         <Box alignItems={"center"}>
           <Heading>CREATE AN ACCOUNT</Heading>
           <FormControl>
@@ -133,9 +140,15 @@ const RegisterScreen = ({navigation}: any) => {
                 onChange={onDateChange}
               />
             </View>
-            
           </FormControl>
-          <Button marginTop={5} isDisabled={!canProceed} isLoading={authIsPending} onPress={onRegisterPressed}>CREATE ACCOUNT</Button>
+          <Button
+            marginTop={5}
+            isDisabled={!canProceed}
+            isLoading={authIsPending}
+            onPress={onRegisterPressed}
+          >
+            CREATE ACCOUNT
+          </Button>
           <Box>
             <Text fontSize={"lg"}>Already have an account?</Text>
             <Button onPress={onGoToLoginScreenPressed}>LOG IN</Button>
@@ -151,8 +164,8 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   dateTimePicker: {
-    width: 190
-  }
+    width: 190,
+  },
 });
 
 export default RegisterScreen;

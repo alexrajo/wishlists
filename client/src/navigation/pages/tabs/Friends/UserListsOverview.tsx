@@ -1,8 +1,21 @@
 import React from "react";
 import WishlistsOverview from "../../../../components/WishlistsOverview";
+import { StackScreenProps } from "@react-navigation/stack";
+import { FriendsStackParamList } from "./FriendsStackNavigator";
 
-const MyListsOverview = ({navigation, route}: {navigation: any, route: {params: {userId: number}}}) => (
-    <WishlistsOverview navigation={navigation} endpoint={`/api/getuserwishlists/${route.params.userId}`}/>
-);
+type MyListsOverviewProps = StackScreenProps<
+  FriendsStackParamList,
+  "ViewWishlists"
+>;
+
+const MyListsOverview = (props: MyListsOverviewProps) => {
+  const { navigation, route } = props;
+  return (
+    <WishlistsOverview
+      navigation={navigation}
+      endpoint={`/api/getuserwishlists/${route.params.userId}`}
+    />
+  );
+};
 
 export default MyListsOverview;
