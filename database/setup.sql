@@ -32,11 +32,15 @@ CREATE TABLE items (
     CONSTRAINT fk_wishlist
         FOREIGN KEY(wishlist_id)
             REFERENCES wishlists(wishlist_id)
+            ON UPDATE CASCADE
             ON DELETE CASCADE,
 
     CONSTRAINT fk_claimed_by_user
         FOREIGN KEY(claimed_by_user_id)
             REFERENCES users(user_id)
+            ON UPDATE CASCADE
+            ON DELETE SET NULL
+            
 );
 
 CREATE TABLE friendships (
@@ -47,11 +51,15 @@ CREATE TABLE friendships (
     PRIMARY KEY(friendship_id),
     CONSTRAINT fk_user1
         FOREIGN KEY(user1_id)
-            REFERENCES users(user_id),
+            REFERENCES users(user_id)
+            ON UPDATE CASCADE
+            ON DELETE CASCADE,
     
     CONSTRAINT fk_user2
         FOREIGN KEY(user2_id)
             REFERENCES users(user_id)
+            ON UPDATE CASCADE
+            ON DELETE CASCADE
 );
 
 CREATE TABLE roles (
@@ -69,11 +77,15 @@ CREATE TABLE user_roles (
 
     CONSTRAINT fk_user
         FOREIGN KEY(user_id)
-            REFERENCES users(user_id),
+            REFERENCES users(user_id)
+            ON UPDATE CASCADE
+            ON DELETE CASCADE,
     
     CONSTRAINT fk_role
         FOREIGN KEY(rolename)
             REFERENCES roles(name)
+            ON UPDATE CASCADE
+            ON DELETE CASCADE
 );
 
 INSERT INTO users (username, password, first_name, last_name, date_of_birth, email) VALUES ('System', '$2b$10$YrRtuGMQGh4.1VydgF2t9OKRZlUDlMIBDdMd8kTtRhZkyjiI46hpq', 'System', 'Systemson', '2002-09-09', 'system@wishlists.com');
