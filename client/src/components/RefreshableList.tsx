@@ -6,7 +6,7 @@ import {
   RefreshControl,
   StyleSheet,
 } from "react-native";
-import useAuth from "../hooks/useAuth";
+import { useUser } from "../hooks/useUser";
 import useFetch from "../hooks/useFetch";
 import { HOST } from "../config/variables";
 import { RefreshableListProps } from "../config/types";
@@ -22,7 +22,7 @@ const RefreshableList = <T,>({
   keyExtractor,
   itemRenderer,
 }: RefreshableListProps) => {
-  const { authToken } = useAuth();
+  const { authToken } = useUser();
 
   const { getRequestObject } = useAuthorizedRequest({
     endpoint: endpoint,

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { HttpRequestMethod } from "../config/types";
 import { HOST } from "../config/variables";
-import useAuth from "./useAuth";
+import { useUser } from "./useUser";
 
 type AuthorizedRequestProps = {
   endpoint: string;
@@ -13,7 +13,7 @@ type AuthorizedRequestProps = {
 
 const useAuthorizedRequest = (props: AuthorizedRequestProps) => {
   const { endpoint, method, onSuccess, onFailure, onError } = props;
-  const { authToken, refreshAuthToken } = useAuth();
+  const { authToken, refreshAuthToken } = useUser();
 
   const getRequestObject = (body?: object) =>
     new Request(HOST + endpoint, {

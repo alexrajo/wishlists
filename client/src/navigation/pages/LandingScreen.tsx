@@ -1,10 +1,10 @@
 import { Center, Text, View, Box, Heading, Button, Spinner } from "native-base";
 import { useContext, useEffect, useState } from "react";
 import { ImageBackground, StyleSheet } from "react-native";
-import useAuth from "../../hooks/useAuth";
+import { useUser } from "../../hooks/useUser";
 
 const LandingScreen = (props: any) => {
-  const { loggedIn, isPending } = useAuth();
+  const { loggedIn, isPending } = useUser();
 
   const onGoToRegisterScreenPressed = () => {
     props.navigation.navigate("Register");

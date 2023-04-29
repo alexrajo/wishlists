@@ -16,7 +16,7 @@ import {
   Pressable,
 } from "native-base";
 import { useState } from "react";
-import useAuth from "../../../../hooks/useAuth";
+import { useUser } from "../../../../hooks/useUser";
 import { HOST } from "../../../../config/variables";
 
 const CreateNewListPage = ({ navigation }: any) => {
@@ -26,7 +26,7 @@ const CreateNewListPage = ({ navigation }: any) => {
   const [isPending, setIsPending] = useState(false);
   const [items, setItems] = useState<Array<string>>([]);
   const [selectedItemIndex, setSelectedItemIndex] = useState<number>();
-  const { authToken, refreshAuthToken } = useAuth();
+  const { authToken, refreshAuthToken } = useUser();
 
   const onCreateWishlistPressed = () => {
     if (!title) return;

@@ -16,7 +16,7 @@ import { useEffect, useState } from "react";
 import useFetch from "../../../../hooks/useFetch";
 import { HOST } from "../../../../config/variables";
 import { ListRenderItemInfo } from "react-native";
-import useAuth from "../../../../hooks/useAuth";
+import { useUser } from "../../../../hooks/useUser";
 import ErrorAlert from "../../../../components/ErrorAlert";
 import { User } from "../../../../config/types";
 
@@ -87,7 +87,7 @@ const ProfilePreview = ({ itemData }: any) => {
   const userData = itemData.item;
   const [request, setRequest] = useState<RequestInfo>();
   const { data, isPending, error, statusCode } = useFetch(request);
-  const { authToken } = useAuth();
+  const { authToken } = useUser();
 
   const onSendFriendRequestPressed = () => {
     const userId = userData.userId;

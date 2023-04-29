@@ -13,7 +13,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { Pressable } from "react-native";
 import { AntDesign } from "@expo/vector-icons";
-import useAuth from "../../../../hooks/useAuth";
+import { useUser } from "../../../../hooks/useUser";
 import RefreshableList from "../../../../components/RefreshableList";
 import {
   Friendship,
@@ -59,7 +59,7 @@ const DeleteFriendshipComponent: React.FC<DeleteFriendshipComponentProps> = ({
   alertTitle,
   alertBody,
 }) => {
-  const { authToken } = useAuth();
+  const { authToken } = useUser();
 
   const onCancelRequestConfirmed = () => {
     if (setActionRequest === undefined) return;
@@ -122,7 +122,7 @@ const DenyRequestComponent: React.FC<DeleteFriendshipComponentWrapperProps> = (
 };
 
 const FriendsOverview = ({ navigation }: any) => {
-  const { userData, authToken } = useAuth();
+  const { userData, authToken } = useUser();
   const [selectedSection, setSelectedSection] = useState(0);
   const [listRefreshSignal, setListRefreshSignal] = useState<number>();
   const [actionRequest, setActionRequest] = useState<RequestInfo>();

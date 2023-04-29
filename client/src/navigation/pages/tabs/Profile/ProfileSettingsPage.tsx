@@ -18,7 +18,7 @@ import KeyboardAvoidingWrapper from "../../../../components/KeyboardAvoidingWrap
 import SimpleAlertDialog from "../../../../components/SimpleAlertDialog";
 import { ProfileStackParams } from "../../../../config/types";
 import { HOST } from "../../../../config/variables";
-import useAuth from "../../../../hooks/useAuth";
+import { useUser } from "../../../../hooks/useUser";
 import useAuthorizedRequest from "../../../../hooks/useAuthorizedRequest";
 import useFetch from "../../../../hooks/useFetch";
 import useTopStackNavigator from "../../../../hooks/useTopStackNavigator";
@@ -61,7 +61,7 @@ const LogoutAlert = (props: AlertProps) => {
 
 const PasswordChangeAlert = (props: AlertProps) => {
   const { isOpen, setIsOpen, onConfirm } = props;
-  const { authToken, refreshAuthToken } = useAuth();
+  const { authToken, refreshAuthToken } = useUser();
 
   const [isValid, setIsValid] = useState(false);
   const [oldPassword, setOldPassword] = useState<string>();
@@ -144,7 +144,7 @@ const ProfileSettingsPage = ({
   route,
 }: ProfileSettingsPageProps) => {
   const { loggedIn, isPending, logout, authToken, refreshAuthToken } =
-    useAuth();
+    useUser();
   const {
     firstName: initialFirstName,
     lastName: initialLastName,

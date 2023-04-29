@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import useAuth from "./useAuth";
+import { useUser } from "./useUser";
 
 type FetchReturnType<T> = {
   data: T;
@@ -10,7 +10,7 @@ type FetchReturnType<T> = {
 };
 
 const useFetch = <T,>(req?: RequestInfo): FetchReturnType<T> => {
-  const { refreshAuthToken } = useAuth();
+  const { refreshAuthToken } = useUser();
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<string>();
   const [data, setData] = useState<any>(null); //Change type from any

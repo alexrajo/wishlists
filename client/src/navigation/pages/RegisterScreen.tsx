@@ -12,7 +12,7 @@ import {
 import { PropsWithRef, useEffect, useState } from "react";
 import { ImageBackground, StyleSheet } from "react-native";
 import type { StackScreenProps } from "@react-navigation/stack";
-import useAuth from "../../hooks/useAuth";
+import { useUser } from "../../hooks/useUser";
 import ErrorAlert from "../../components/ErrorAlert";
 import RNDateTimePicker from "@react-native-community/datetimepicker";
 
@@ -29,7 +29,7 @@ const RegisterScreen = ({ navigation }: any) => {
     isPending: authIsPending,
     error: authError,
     signup,
-  } = useAuth();
+  } = useUser();
 
   const onGoToLoginScreenPressed = () => {
     navigation.navigate("Login");

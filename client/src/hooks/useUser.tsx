@@ -1,11 +1,4 @@
-import {
-  useEffect,
-  useState,
-  useContext,
-  createContext,
-  Component,
-  Context,
-} from "react";
+import { useEffect, useState, useContext, createContext } from "react";
 import * as SecureStore from "expo-secure-store";
 import { HOST } from "../config/variables";
 import {
@@ -15,7 +8,7 @@ import {
   User,
 } from "../config/types";
 
-interface AuthContextInterface {
+interface UserContextInterface {
   loggedIn: boolean;
   isPending: boolean;
   error?: string;
@@ -28,7 +21,7 @@ interface AuthContextInterface {
 }
 
 const refreshTokenSecureStoreKey = "refreshToken";
-const AuthContext = createContext<AuthContextInterface>({
+const UserContext = createContext<UserContextInterface>({
   loggedIn: false,
   isPending: true,
   error: "",
@@ -44,16 +37,16 @@ const getValueFromKey = async (key: string) => {
   return result || undefined;
 };
 
-export const ProvideAuth = ({ children }: any) => {
-  const auth = useProvideAuth();
+export const ProvideUser = ({ children }: any) => {
+  const user = useProvideUser();
   return (
-    <AuthContext.Provider value={auth} key={1}>
+    <UserContext.Provider value={user} key={1}>
       {children}
-    </AuthContext.Provider>
+    </UserContext.Provider>
   );
 };
 
-const useProvideAuth = () => {
+const useProvideUser = () => {
   const [loggedIn, setLoggedIn] = useState(false);
   const [authToken, setAuthToken] = useState<string | undefined>();
   const [refreshToken, setRefreshToken] = useState<string | undefined>();
@@ -221,8 +214,6 @@ const useProvideAuth = () => {
   };
 };
 
-const useAuth = () => {
-  return useContext(AuthContext);
+export const useUser = () => {
+  return useContext(UserContext);
 };
-
-export default useAuth;

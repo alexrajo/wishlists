@@ -13,7 +13,7 @@ import {
 } from "native-base";
 import { useEffect, useState } from "react";
 import { ImageBackground, StyleSheet } from "react-native";
-import useAuth from "../../hooks/useAuth";
+import { useUser } from "../../hooks/useUser";
 import ErrorAlert from "../../components/ErrorAlert";
 
 const LoginScreen = (props: any) => {
@@ -26,7 +26,7 @@ const LoginScreen = (props: any) => {
     isPending: authIsPending,
     error: authError,
     login,
-  } = useAuth();
+  } = useUser();
 
   const onGoToRegisterScreenPressed = () => {
     props.navigation.navigate("Register");

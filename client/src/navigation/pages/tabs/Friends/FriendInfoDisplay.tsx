@@ -16,7 +16,7 @@ import SimpleAlertDialog from "../../../../components/SimpleAlertDialog";
 import { useEffect, useState } from "react";
 import useFetch from "../../../../hooks/useFetch";
 import { HOST } from "../../../../config/variables";
-import useAuth from "../../../../hooks/useAuth";
+import { useUser } from "../../../../hooks/useUser";
 import { ParamListBase } from "@react-navigation/native";
 import { StackScreenProps } from "@react-navigation/stack";
 import { FriendsStackParamList } from "./FriendsStackNavigator";
@@ -32,7 +32,7 @@ const FriendInfoDisplay = (props: FriendInfoDisplayProps) => {
     profileData: undefined,
     friendshipId: undefined,
   };
-  const { authToken } = useAuth();
+  const { authToken } = useUser();
   const [isAlertDialogOpen, setIsAlertDialogOpen] = useState(false);
 
   const [removeFriendRequestInfo, setRemoveFriendRequestInfo] =

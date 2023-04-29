@@ -17,7 +17,7 @@ import { MaterialIcons } from "@expo/vector-icons";
 import { useEffect, useRef, useState } from "react";
 import { HOST } from "../../config/variables";
 import useFetch from "../../hooks/useFetch";
-import useAuth from "../../hooks/useAuth";
+import { useUser } from "../../hooks/useUser";
 import { Item, Wishlist } from "../../config/types";
 import SimpleAlertDialog from "../../components/SimpleAlertDialog";
 import { StackScreenProps } from "@react-navigation/stack";
@@ -40,7 +40,7 @@ const ListViewingPage = (props: ListViewingPageProps) => {
     statusCode: deletionStatusCode,
   } = useFetch(deleteRequest);
 
-  const { authToken, loggedIn, userData } = useAuth();
+  const { authToken, loggedIn, userData } = useUser();
   const cancelRef = useRef(null);
   const canShowSettings =
     loggedIn && userData !== undefined && userData.userId === wishlist.ownerId;
