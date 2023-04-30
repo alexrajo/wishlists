@@ -11,7 +11,6 @@ import {
 } from "native-base";
 import { MaterialCommunityIcons, FontAwesome5 } from "@expo/vector-icons";
 import { StyleSheet } from "react-native";
-import { LimitedUserInfo } from "../../../../config/types";
 import SimpleAlertDialog from "../../../../components/SimpleAlertDialog";
 import { useEffect, useState } from "react";
 import useFetch from "../../../../hooks/useFetch";

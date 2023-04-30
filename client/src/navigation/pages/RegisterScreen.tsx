@@ -9,9 +9,8 @@ import {
   View,
   VStack,
 } from "native-base";
-import { PropsWithRef, useEffect, useState } from "react";
-import { ImageBackground, StyleSheet } from "react-native";
-import type { StackScreenProps } from "@react-navigation/stack";
+import { useEffect, useState } from "react";
+import { StyleSheet } from "react-native";
 import { useUser } from "../../hooks/useUser";
 import ErrorAlert from "../../components/ErrorAlert";
 import RNDateTimePicker from "@react-native-community/datetimepicker";

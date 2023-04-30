@@ -17,7 +17,7 @@ import { useUser } from "../../../../hooks/useUser";
 import RefreshableList from "../../../../components/RefreshableList";
 import {
   Friendship,
-  LimitedUserInfo,
+  CondensedUser,
   ListItemRenderer,
 } from "../../../../config/types";
 import { ListBox, ListButton } from "../../../../components/ListElements";
@@ -27,7 +27,7 @@ import SimpleAlertDialog from "../../../../components/SimpleAlertDialog";
 import ErrorAlert from "../../../../components/ErrorAlert";
 
 interface DeleteFriendshipComponentWrapperProps {
-  targetUser: LimitedUserInfo;
+  targetUser: CondensedUser;
   friendshipId: number;
   setIsAlertDialogOpen: React.Dispatch<React.SetStateAction<boolean>>;
   setActionRequest?: React.Dispatch<
@@ -171,10 +171,7 @@ const FriendsOverview = ({ navigation }: any) => {
     );
   };
 
-  const onViewProfilePressed = (
-    user: LimitedUserInfo,
-    friendshipId: number
-  ) => {
+  const onViewProfilePressed = (user: CondensedUser, friendshipId: number) => {
     navigation.navigate("ViewFriend", {
       friendshipId: friendshipId,
       profileData: user,

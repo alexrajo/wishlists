@@ -4,13 +4,13 @@ import AddFriendPage from "./AddFriendPage";
 import FriendInfoDisplay from "./FriendInfoDisplay";
 import FriendsOverview from "./FriendsOverview";
 import UserListsOverview from "./UserListsOverview";
-import { LimitedUserInfo, Wishlist } from "../../../../config/types";
+import { CondensedUser, Wishlist } from "../../../../config/types";
 
 export type FriendsStackParamList = {
   Overview: undefined;
   AddFriend: undefined;
   ViewFriend: {
-    profileData: LimitedUserInfo;
+    profileData: CondensedUser;
     friendshipId: number;
   };
   ViewWishlists: { userId: number };

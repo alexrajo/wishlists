@@ -2,13 +2,22 @@ import { ParamListBase } from "@react-navigation/native";
 import React from "react";
 import { ListRenderItemInfo } from "react-native";
 
-export interface SignUpData {
-  firstName: string | undefined;
-  lastName: string | undefined;
-  username: string | undefined;
+export interface CondensedUser {
+  userId: number;
+  username: string;
+  firstName: string;
+  lastName: string;
+}
+
+export interface User extends CondensedUser {
   email?: string;
-  password: string | undefined;
-  dateOfBirth: Date;
+  dateOfBirth?: Date;
+}
+
+export interface DisplayableUserInfo extends Omit<User, "userId"> {}
+
+export interface SignUpData extends Partial<DisplayableUserInfo> {
+  password?: string;
 }
 
 export interface Item {
@@ -25,18 +34,6 @@ export interface Wishlist {
   items: Array<Item>;
 }
 
-export interface LimitedUserInfo {
-  userId: number;
-  username: string;
-  firstName: string;
-  lastName: string;
-}
-
-export interface User extends LimitedUserInfo {
-  email?: string;
-  dateOfBirth?: Date;
-}
-
 export type OptionalUserData = Partial<User>;
 
 export interface Friendship {
@@ -44,8 +41,8 @@ export interface Friendship {
   initiatorId: number;
   receiverId: number;
   confirmed: boolean;
-  receiver?: LimitedUserInfo;
-  initiator?: LimitedUserInfo;
+  receiver?: CondensedUser;
+  initiator?: CondensedUser;
 }
 
 export interface SignedUserData {
@@ -60,7 +57,7 @@ export interface AuthorizationResponse {
 }
 
 export interface AuthenticationResponse extends AuthorizationResponse {
-  userData?: Required<User>;
+  userData?: User;
 }
 
 export interface RefreshableListProps {

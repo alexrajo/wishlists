@@ -1,21 +1,20 @@
+import { FontAwesome5, MaterialCommunityIcons } from "@expo/vector-icons";
 import {
   Avatar,
-  View,
-  Center,
   Box,
+  Button,
+  Flex,
   Heading,
   Text,
   VStack,
-  Button,
-  Flex,
+  View,
 } from "native-base";
-import { MaterialCommunityIcons, FontAwesome5 } from "@expo/vector-icons";
-import { Pressable, StyleSheet } from "react-native";
-import { useUser } from "../../../../hooks/useUser";
 import { useEffect, useState } from "react";
-import useFetch from "../../../../hooks/useFetch";
-import { SignUpData } from "../../../../config/types";
+import { Pressable, StyleSheet } from "react-native";
+import { DisplayableUserInfo } from "../../../../config/types";
 import useAuthorizedRequest from "../../../../hooks/useAuthorizedRequest";
+import useFetch from "../../../../hooks/useFetch";
+import { useUser } from "../../../../hooks/useUser";
 
 const ProfileInfoDisplay = ({ navigation }: any) => {
   const { authToken } = useUser();
@@ -31,7 +30,7 @@ const ProfileInfoDisplay = ({ navigation }: any) => {
     error: fetchError,
     isPending,
     refresh,
-  } = useFetch<SignUpData>(request);
+  } = useFetch<DisplayableUserInfo>(request);
 
   const onSettingsButtonPressed = () => {
     navigation.navigate("Settings", profileData);
