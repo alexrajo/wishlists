@@ -1,32 +1,16 @@
-import {
-  Center,
-  Text,
-  View,
-  Box,
-  Heading,
-  FormControl,
-  VStack,
-  HStack,
-  Input,
-  Button,
-  Alert,
-} from "native-base";
+import { Center, Text, View, Box, Heading, FormControl, VStack, HStack, Input, Button, Alert } from "native-base";
 import { useEffect, useState } from "react";
 import { ImageBackground, StyleSheet } from "react-native";
 import { useUser } from "../../hooks/useUser";
 import ErrorAlert from "../../components/ErrorAlert";
+import { HOST } from "../../config/variables";
 
 const LoginScreen = (props: any) => {
   const [usernameOrEmail, setUsernameOrEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [canProceed, setCanProceed] = useState(false);
 
-  const {
-    loggedIn,
-    isPending: authIsPending,
-    error: authError,
-    login,
-  } = useUser();
+  const { loggedIn, isPending: authIsPending, error: authError, login } = useUser();
 
   const onGoToRegisterScreenPressed = () => {
     props.navigation.navigate("Register");
@@ -49,9 +33,7 @@ const LoginScreen = (props: any) => {
   return (
     <View style={styles.container}>
       <Center style={styles.container} p={15}>
-        {!authIsPending && authError && !loggedIn && (
-          <ErrorAlert error={authError} />
-        )}
+        {!authIsPending && authError && !loggedIn && <ErrorAlert error={authError} />}
         <Box alignItems={"center"}>
           <Heading>LOG IN</Heading>
           <FormControl>
@@ -85,9 +67,7 @@ const LoginScreen = (props: any) => {
           </Button>
           <Box>
             <Text fontSize={"lg"}>Don't have an account?</Text>
-            <Button onPress={onGoToRegisterScreenPressed}>
-              CREATE AN ACCOUNT
-            </Button>
+            <Button onPress={onGoToRegisterScreenPressed}>CREATE AN ACCOUNT</Button>
           </Box>
         </Box>
       </Center>
