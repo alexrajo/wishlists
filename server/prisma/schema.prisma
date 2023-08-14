@@ -1,10 +1,10 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["fullTextSearch"]
 }
 
 datasource db {
-  provider = "sqlserver"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -13,8 +13,8 @@ model Friendship {
   initiatorId  Int     @map("user1_id")
   receiverId   Int     @map("user2_id")
   confirmed    Boolean
-  initiator    User    @relation("friendships_user1_idTousers", fields: [initiatorId], references: [userId], onDelete: NoAction, onUpdate: NoAction, map: "fk_user1")
-  receiver     User    @relation("friendships_user2_idTousers", fields: [receiverId], references: [userId], onDelete: NoAction, onUpdate: NoAction, map: "fk_user2")
+  initiator    User    @relation("friendships_user1_idTousers", fields: [initiatorId], references: [userId], onDelete: Cascade, map: "fk_user1")
+  receiver     User    @relation("friendships_user2_idTousers", fields: [receiverId], references: [userId], onDelete: Cascade, map: "fk_user2")
 
   @@map("friendships")
 }
@@ -30,7 +30,7 @@ model User {
   token                  String?      @db.VarChar(256)
   friendshipsAsInitiator Friendship[] @relation("friendships_user1_idTousers")
   friendshipsAsReceiver  Friendship[] @relation("friendships_user2_idTousers")
-  items                  Item[]      @relation("itemsTousers")
+  items                  Item[]       @relation("itemsTousers")
   userRoles              UserRole[]   @relation("user_rolesTousers")
 
   @@map("users")
@@ -41,7 +41,7 @@ model Wishlist {
   ownerId     Int     @map("owner_id")
   title       String  @db.VarChar(25)
   description String? @db.VarChar(128)
-  items       Item[] @relation("itemTowishlist")
+  items       Item[]  @relation("itemTowishlist")
 
   @@map("wishlists")
 }
@@ -58,18 +58,19 @@ model UserRole {
   userId         Int       @map("user_id")
   rolename       String    @db.VarChar(16)
   expirationDate DateTime? @map("expiration_date") @db.Date
-  role           Role      @relation(fields: [rolename], references: [name], onDelete: NoAction, onUpdate: NoAction, map: "fk_role")
-  user           User      @relation("user_rolesTousers", fields: [userId], references: [userId], onDelete: NoAction, onUpdate: NoAction, map: "fk_user")
+  role           Role      @relation(fields: [rolename], references: [name], onDelete: Cascade, map: "fk_role")
+  user           User      @relation("user_rolesTousers", fields: [userId], references: [userId], onDelete: Cascade, map: "fk_user")
 
   @@map("user_roles")
 }
 
 model Item {
-  itemId             BigInt   @id @default(autoincrement()) @map("item_id")
-  wishlistId         BigInt @map("wishlist_id")
-  name               String   @db.VarChar(32)
-  claimedByUserId    Int? @map("claimed_by_user_id")
-  users              User?    @relation("itemsTousers", fields: [claimedByUserId], references: [userId], onDelete: NoAction, onUpdate: NoAction, map: "fk_claimed_by_user")
-  wishlist           Wishlist @relation("itemTowishlist", fields: [wishlistId], references: [wishlistId], onDelete: Cascade, onUpdate: NoAction, map: "fk_wishlist")
+  itemId          BigInt   @id @default(autoincrement()) @map("item_id")
+  wishlistId      BigInt   @map("wishlist_id")
+  name            String   @db.VarChar(32)
+  claimedByUserId Int?     @map("claimed_by_user_id")
+  users           User?    @relation("itemsTousers", fields: [claimedByUserId], references: [userId], map: "fk_claimed_by_user")
+  wishlist        Wishlist @relation("itemTowishlist", fields: [wishlistId], references: [wishlistId], onDelete: Cascade, map: "fk_wishlist")
+
   @@map("items")
 }

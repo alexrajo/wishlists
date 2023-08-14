@@ -15,7 +15,7 @@ import {
   VStack,
   Input,
 } from "native-base";
-import { ListRenderItemInfo, StyleSheet } from "react-native";
+import { Animated, ListRenderItemInfo, StyleSheet } from "react-native";
 import { MaterialIcons } from "@expo/vector-icons";
 import { useEffect, useRef, useState } from "react";
 import { HOST } from "../../config/variables";
@@ -25,6 +25,7 @@ import { Item, Wishlist } from "../../config/types";
 import SimpleAlertDialog from "../../components/SimpleAlertDialog";
 import { StackScreenProps } from "@react-navigation/stack";
 import { FriendsStackParamList } from "./tabs/Friends/FriendsStackNavigator";
+import { Swipeable } from "react-native-gesture-handler";
 
 type ListViewingPageProps = StackScreenProps<FriendsStackParamList, "ViewList">;
 type AddNewItemButtonProps = {
@@ -37,7 +38,8 @@ const ListViewingPage = (props: ListViewingPageProps) => {
   const isOwnWishlist = true;
 
   const [items, setItems] = useState<Array<Item>>(wishlist.items);
-  const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
+  const [isDeleteWishlistAlertOpen, setIsDeleteWishlistAlertOpen] = useState(false);
+  const [isDeleteItemAlertOpen, setIsDeleteItemAlertOpen] = useState(false);
   const [isCreateItemModalOpen, setIsCreateItemModalOpen] = useState(false);
   const [deleteRequest, setDeleteRequest] = useState<RequestInfo>();
   const {
@@ -91,7 +93,7 @@ const ListViewingPage = (props: ListViewingPageProps) => {
       })
     );
 
-    setIsDeleteAlertOpen(false);
+    setIsDeleteWishlistAlertOpen(false);
   };
 
   useEffect(() => {
@@ -122,26 +124,43 @@ const ListViewingPage = (props: ListViewingPageProps) => {
                   }}
                 />
               );
-            return <WishlistItemComponent itemInfo={itemData.item} isOwn={isOwnWishlist} />;
+            return (
+              <WishlistItemComponent
+                itemInfo={itemData.item}
+                isOwn={isOwnWishlist}
+                onDelete={() => setIsDeleteItemAlertOpen(true)}
+              />
+            );
           }}
-          keyExtractor={(item) => item.itemId.toString()}
+          keyExtractor={(item: Item) => item.itemId.toString()}
         />
       </Center>
       {canShowSettings && (
         <>
-          <Pressable position="absolute" right={5} top={5} onPress={() => setIsDeleteAlertOpen(true)}>
+          <Pressable position="absolute" right={5} top={5} onPress={() => setIsDeleteWishlistAlertOpen(true)}>
             <MaterialIcons name="delete-forever" color="red" size={32} />
           </Pressable>
 
           <SimpleAlertDialog
             title="Delete wishlist"
-            isAlertDialogOpen={isDeleteAlertOpen}
-            setIsAlertDialogOpen={setIsDeleteAlertOpen}
+            isAlertDialogOpen={isDeleteWishlistAlertOpen}
+            setIsAlertDialogOpen={setIsDeleteWishlistAlertOpen}
             onConfirm={onDeleteConfirmed}
             confirmText="Delete"
             confirmColor="rose"
           >
             <Text>Are you sure you want to PERMANENTLY delete this wishlist?</Text>
+          </SimpleAlertDialog>
+
+          <SimpleAlertDialog
+            title="Delete item"
+            isAlertDialogOpen={isDeleteItemAlertOpen}
+            setIsAlertDialogOpen={setIsDeleteItemAlertOpen}
+            onConfirm={() => console.log("delete")}
+            confirmText="Delete"
+            confirmColor="rose"
+          >
+            <Text>Are you sure you want to PERMANENTLY delete this item?</Text>
           </SimpleAlertDialog>
         </>
       )}
@@ -177,35 +196,71 @@ const AddNewItemButton = (props: AddNewItemButtonProps) => {
   );
 };
 
-const WishlistItemComponent = ({ itemInfo, isOwn }: { itemInfo: Item; isOwn: boolean }) => {
+const WishlistItemComponent = ({
+  itemInfo,
+  isOwn,
+  onDelete,
+}: {
+  itemInfo: Item;
+  isOwn: boolean;
+  onDelete: () => void;
+}) => {
   const displayAsClaimed = !isOwn && itemInfo.claimedById !== undefined;
 
+  const renderRightActions = (
+    progress: Animated.AnimatedInterpolation<string | number>,
+    dragX: Animated.AnimatedInterpolation<string | number>
+  ) => {
+    const scale = dragX.interpolate({
+      inputRange: [-100, 0],
+      outputRange: [0, 100],
+      extrapolate: "clamp",
+    });
+
+    return (
+      <Animated.View
+        style={{
+          height: "100%",
+          width: 100,
+          transform: [{ translateX: scale }],
+          alignItems: "center",
+          justifyContent: "center",
+        }}
+      >
+        <Button backgroundColor={"red.600"} width={"full"} height={"full"} rounded={"none"} onPress={onDelete}>
+          <MaterialIcons name="delete-forever" color="white" size={32} />
+        </Button>
+      </Animated.View>
+    );
+  };
+
   return (
-    <Box m={2} paddingBottom={2} flex={1} borderBottomColor="gray.300" borderBottomWidth="1">
-      <HStack alignItems="center" space={2}>
-        <CircleIcon color="black" size="xs" flex={1} />
-        <View flexDirection="row" flex={5}>
-          <Text
-            fontSize="lg"
-            textDecorationLine={displayAsClaimed ? "line-through" : "none"}
-            color={displayAsClaimed ? "gray.400" : "black"}
-          >
-            {itemInfo.name}
-          </Text>
-          {displayAsClaimed && (
-            <Text color="gray.400" fontSize="lg" fontStyle="italic">
-              {" "}
-              Claimed
+    <Swipeable overshootFriction={10} renderRightActions={renderRightActions}>
+      <Box padding={3} flex={1} borderBottomColor="gray.300" borderBottomWidth="1">
+        <HStack alignItems="center" space={2}>
+          <View flexDirection="row" flex={5}>
+            <Text
+              fontSize="lg"
+              textDecorationLine={displayAsClaimed ? "line-through" : "none"}
+              color={displayAsClaimed ? "gray.400" : "black"}
+            >
+              {itemInfo.name}
             </Text>
-          )}
-        </View>
-        {!displayAsClaimed && !isOwn && (
-          <View flex={2}>
-            <Button alignSelf="flex-end">Claim</Button>
+            {displayAsClaimed && (
+              <Text color="gray.400" fontSize="lg" fontStyle="italic">
+                {" "}
+                Claimed
+              </Text>
+            )}
           </View>
-        )}
-      </HStack>
-    </Box>
+          {!displayAsClaimed && !isOwn && (
+            <View flex={2}>
+              <Button alignSelf="flex-end">Claim</Button>
+            </View>
+          )}
+        </HStack>
+      </Box>
+    </Swipeable>
   );
 };
 
